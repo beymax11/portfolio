@@ -6,7 +6,7 @@ import Hero from './components/Hero'
 import TechStack from './components/TechStack'
 import Work from './components/Work'
 import Contact from './components/Contact'
-import WhatsAppButton from './components/WhatsAppButton'
+import WhatsAppButton from './components/MailButton'
 
 export default function Home() {
   useEffect(() => {
