@@ -21,10 +21,10 @@ export default function Hero() {
           style={{ animationDirection: 'reverse' }}
         ></div>
       </div>
-      
+
       {/* Image (Desktop Only) */}
       <div className="absolute right-0 top-1/2 -translate-y-1/2 -translate-x-32 w-1/3 h-full hidden lg:flex items-center justify-center z-20">
-        <div 
+        <div
           className="w-[400px] h-[400px] rounded-full overflow-hidden cursor-pointer relative"
           style={{
             transform: isHovered ? 'scale(1.1)' : 'scale(1)',
@@ -64,7 +64,7 @@ export default function Hero() {
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
               </span>
               <span className="text-xs font-bold uppercase tracking-widest text-slate-600 dark:text-slate-300">
-                Available for 2025
+                Available for 2026
               </span>
             </div>
 
@@ -93,23 +93,23 @@ export default function Hero() {
             >
               Hi! I am Rim Vernon, a passionate{' '}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-purple-600">
-                Web Developer
+                Front-end Developer
               </span>{' '}
               with a strong eye for detail and a love for crafting clean, modern, and user-friendly interfaces. I specialize in turning ideas and wireframes into interactive, responsive, and visually appealing websites.
-             
+
             </p>
 
             <div
               className="flex flex-col items-center justify-center lg:items-start gap-6 mt-12"
             >
-              <div 
+              <div
                 className="relative inline-block"
                 onMouseEnter={() => setIsResumeHovered(true)}
                 onMouseLeave={() => setIsResumeHovered(false)}
               >
                 {/* Invisible area above button to maintain hover */}
                 {isResumeHovered && (
-                  <div 
+                  <div
                     className="absolute left-0 right-0 bottom-full mb-0 h-[540px] pointer-events-auto"
                     style={{ zIndex: 9998 }}
                   ></div>
@@ -126,10 +126,10 @@ export default function Hero() {
                   </span>
                   <div className="absolute inset-0 bg-primary transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300 ease-out"></div>
                 </a>
-                
+
                 {/* Resume Preview on Hover - Directly Above Button */}
                 {isResumeHovered && (
-                  <div 
+                  <div
                     ref={previewRef}
                     className="absolute left-0 bottom-full mb-4 w-[400px] h-[520px] bg-white dark:bg-slate-800 rounded-lg shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-700 animate-in fade-in slide-in-from-bottom-2 duration-300"
                     style={{ zIndex: 9999 }}
@@ -152,7 +152,7 @@ export default function Hero() {
                   </div>
                 )}
               </div>
-              
+
               {/* Social Media Icons */}
               <ul className="social-icons flex items-center gap-4">
                 <li data-tooltip="GitHub" style={{ '--bg': '#000000' } as React.CSSProperties}>

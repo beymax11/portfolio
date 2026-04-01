@@ -16,10 +16,10 @@ export default function Contact() {
 
         <div className="flex flex-col md:flex-row justify-center items-center gap-6 mt-16 reveal">
           <Link
-            href="mailto:hello@alex.dev"
+            href="mailto:dimaandalrim@gmail.com"
             className="px-12 py-6 bg-slate-900 dark:bg-white text-white dark:text-black rounded-full font-bold text-xl hover:scale-105 transition-transform duration-300 shadow-2xl shadow-primary/20"
           >
-           Start a New Project
+            Start a New Project
           </Link>
           <Link
             href="#"
@@ -30,7 +30,7 @@ export default function Contact() {
         </div>
 
         <div className="mt-32 flex justify-center items-center border-t border-slate-200 dark:border-white/10 pt-8 text-sm text-slate-500">
-          <div>© 2025 Rim Vernon D. All rights reserved.</div>
+          <div>© 2026 Rim Vernon D. All rights reserved.</div>
         </div>
       </div>
     </section>
