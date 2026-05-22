@@ -1,47 +1,36 @@
 'use client'
 
-import { useEffect } from 'react'
-import Navbar from './components/Navbar'
+import AmbientBackground from './components/effects/AmbientBackground'
+import CustomCursor from './components/effects/CustomCursor'
+import MouseGlow from './components/effects/MouseGlow'
+import NoiseOverlay from './components/effects/NoiseOverlay'
+import PageLoader from './components/effects/PageLoader'
+import ScrollProgress from './components/effects/ScrollProgress'
+import Footer from './components/Footer'
 import Hero from './components/Hero'
+import MailButton from './components/MailButton'
+import Navbar from './components/Navbar'
 import TechStack from './components/TechStack'
 import Work from './components/Work'
-import Contact from './components/Contact'
-import WhatsAppButton from './components/MailButton'
 
 export default function Home() {
-  useEffect(() => {
-    // Scroll reveal observer
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('active')
-          }
-        })
-      },
-      { threshold: 0.1 }
-    )
-
-    const revealElements = document.querySelectorAll('.reveal')
-    revealElements.forEach((el) => observer.observe(el))
-
-    return () => {
-      revealElements.forEach((el) => observer.unobserve(el))
-    }
-  }, [])
-
   return (
-    <main>
-      {/* Grid Pattern Background */}
-      <div className="fixed inset-0 z-[-1] bg-grid pointer-events-none opacity-50"></div>
+    <>
+      <PageLoader />
+      <ScrollProgress />
+      <CustomCursor />
+      <MouseGlow />
+      <AmbientBackground />
+      <NoiseOverlay />
 
-      <Navbar />
-      <Hero />
-      <TechStack />
-      <Work />
-      <Contact />
-      <WhatsAppButton />
-    </main>
+      <main className="relative">
+        <Navbar />
+        <Hero />
+        <Work />
+        <TechStack />
+        <Footer />
+        <MailButton />
+      </main>
+    </>
   )
 }
-

@@ -1,94 +1,139 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { useTheme } from '../hooks/useTheme'
+import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
+import { useEffect, useState } from 'react'
+import { navLinks } from '../lib/data'
 
 export default function Navbar() {
-  const { theme, toggleTheme, mounted } = useTheme()
-  const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [activeSection, setActiveSection] = useState('home')
+  const [scrolled, setScrolled] = useState(false)
+  const [menuOpen, setMenuOpen] = useState(false)
 
-  const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen)
-  }
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 40)
 
-  const closeMenu = () => {
-    setIsMenuOpen(false)
-  }
+      const sections = navLinks.map((l) => l.href.replace('#', ''))
+      for (const id of [...sections].reverse()) {
+        const el = document.getElementById(id)
+        if (el && el.getBoundingClientRect().top <= 120) {
+          setActiveSection(id)
+          break
+        }
+      }
+    }
+
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    handleScroll()
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
 
   return (
     <>
-      <div className="fixed top-6 left-0 right-0 z-50 flex justify-center px-4">
-        <nav className="glass-nav rounded-full px-8 py-4 flex items-center gap-10 shadow-xl shadow-black/5 dark:shadow-black/20 transition-all duration-300">
-          <Link href="#" className="text-xl font-bold font-display tracking-tight text-slate-900 dark:text-white">
-            rimvernon<span className="text-primary">.</span>
+      <motion.header
+        className="fixed top-0 left-0 right-0 z-50 flex justify-center px-4 pt-5 md:pt-6"
+        initial={{ y: -100, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 1.9, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+      >
+        <nav
+          className={`glass-nav flex w-full max-w-3xl items-center justify-between rounded-2xl px-5 py-3 md:px-6 md:py-3.5 transition-all duration-500 ${
+            scrolled ? 'shadow-glass' : ''
+          }`}
+        >
+          <Link
+            href="#home"
+            className="font-display text-lg font-bold tracking-tight text-foreground"
+            data-cursor="pointer"
+          >
+            rimvernon<span className="text-accent">.</span>
           </Link>
 
-          <div className="hidden md:flex items-center gap-8 text-sm font-medium">
-            <Link href="#home" className="text-slate-600 dark:text-slate-400 hover:text-primary dark:hover:text-white transition-colors">
-              Home
-            </Link>
-            <Link href="#work" className="text-slate-600 dark:text-slate-400 hover:text-primary dark:hover:text-white transition-colors">
-              Work
-            </Link>
-            <Link href="#stack" className="text-slate-600 dark:text-slate-400 hover:text-primary dark:hover:text-white transition-colors">
-              Stack
-            </Link>
+          <div className="hidden md:flex items-center gap-1">
+            {navLinks.map((link) => {
+              const id = link.href.replace('#', '')
+              const isActive = activeSection === id
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={`relative px-4 py-2 text-sm font-medium transition-colors duration-300 link-underline ${
+                    isActive ? 'text-foreground active' : 'text-muted hover:text-foreground'
+                  }`}
+                  data-cursor="pointer"
+                >
+                  {link.label}
+                </Link>
+              )
+            })}
           </div>
 
-          <div className="flex items-center gap-4">
-            {mounted && (
-              <button
-                onClick={toggleTheme}
-                className="w-9 h-9 rounded-full flex items-center justify-center text-slate-500 hover:text-primary hover:bg-slate-100 dark:hover:bg-white/10 transition-all"
-              >
-                <i className={`fas ${theme === 'dark' ? 'fa-sun' : 'fa-moon'} text-lg`}></i>
-              </button>
-            )}
+          <div className="flex items-center gap-3">
             <Link
               href="#contact"
-              className="hidden md:block px-6 py-2.5 bg-slate-900 dark:bg-white text-white dark:text-black rounded-full font-bold text-xs tracking-wide hover:scale-105 transition-transform"
+              className="hidden md:inline-flex px-5 py-2 rounded-full text-xs font-semibold tracking-wider uppercase bg-accent/90 text-white hover:bg-accent hover:shadow-glow-sm transition-all duration-500"
+              data-cursor="pointer"
             >
-              HIRE ME
+              Hire Me
             </Link>
             <button
-              onClick={toggleMenu}
-              className="md:hidden text-slate-900 dark:text-white"
+              type="button"
+              onClick={() => setMenuOpen(!menuOpen)}
+              className="md:hidden flex flex-col gap-1.5 p-2"
+              aria-label="Toggle menu"
+              data-cursor="pointer"
             >
-              <i className="fas fa-bars text-lg"></i>
+              <span
+                className={`block w-5 h-0.5 bg-foreground transition-all duration-300 ${menuOpen ? 'rotate-45 translate-y-2' : ''}`}
+              />
+              <span
+                className={`block w-5 h-0.5 bg-foreground transition-all duration-300 ${menuOpen ? 'opacity-0' : ''}`}
+              />
+              <span
+                className={`block w-5 h-0.5 bg-foreground transition-all duration-300 ${menuOpen ? '-rotate-45 -translate-y-2' : ''}`}
+              />
             </button>
           </div>
         </nav>
-      </div>
+      </motion.header>
 
-      {/* Mobile Menu Overlay */}
-      <div
-        className={`fixed inset-0 z-40 bg-white/95 dark:bg-black/95 backdrop-blur-xl flex items-center justify-center transition-opacity duration-300 ${
-          isMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
-        }`}
-      >
-        <div className="flex flex-col items-center gap-8 text-2xl font-display font-bold">
-          <Link href="#home" onClick={closeMenu} className="hover:text-primary transition-colors">
-            Home
-          </Link>
-          <Link href="#work" onClick={closeMenu} className="hover:text-primary transition-colors">
-            Work
-          </Link>
-          <Link href="#stack" onClick={closeMenu} className="hover:text-primary transition-colors">
-            Tech Stack
-          </Link>
-          <Link href="#contact" onClick={closeMenu} className="hover:text-primary transition-colors">
-            Contact
-          </Link>
-          <button
-            onClick={closeMenu}
-            className="absolute top-8 right-8 text-slate-500 hover:text-black dark:hover:text-white"
+      <AnimatePresence>
+        {menuOpen && (
+          <motion.div
+            className="fixed inset-0 z-40 bg-bg/95 backdrop-blur-2xl flex items-center justify-center md:hidden"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
           >
-            <i className="fas fa-times text-2xl"></i>
-          </button>
-        </div>
-      </div>
+            <motion.div
+              className="flex flex-col items-center gap-8"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 20 }}
+            >
+              {navLinks.map((link, i) => (
+                <motion.div
+                  key={link.href}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.08 }}
+                >
+                  <Link
+                    href={link.href}
+                    onClick={() => setMenuOpen(false)}
+                    className="font-display text-3xl font-bold text-foreground hover:text-accent transition-colors"
+                    data-cursor="pointer"
+                  >
+                    {link.label}
+                  </Link>
+                </motion.div>
+              ))}
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </>
   )
 }
-

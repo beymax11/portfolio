@@ -1,257 +1,196 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import Image from 'next/image'
 import Link from 'next/link'
-
-interface Project {
-  id: number
-  title: string
-  category: string
-  description: string
-  image: string
-  alt: string
-  offset?: boolean
-  color: string
-  link?: string
-  isModal?: boolean
-}
-
-const projects: Project[] = [
-  {
-    id: 1,
-    title: 'Ecommerce Platform',
-    category: 'E-Commerce Platform',
-    description: 'A full-stack e-commerce solution with modern UI/UX.',
-    image: 'izaj.png',
-    alt: 'E-Commerce Dashboard',
-    color: 'from-blue-600 to-cyan-500',
-    link: 'https://izaj-ecommerce.vercel.app/',
-  },
-  {
-    id: 2,
-    title: 'Admin Panel',
-    category: 'SaaS Dashboard',
-    description: 'Intelligent asset management with real-time analytics.',
-    image: 'desk.png',
-    alt: 'AI Dashboard',
-    offset: true,
-    color: 'from-purple-600 to-pink-500',
-    isModal: true,
-  },
-  {
-    id: 3,
-    title: 'AI Chatbox',
-    category: 'AI Application',
-    description: '  A full-stack AI application with modern UI/UX.',
-    image: 'ai.png',
-    alt: 'AI Chatbox',
-    color: 'from-orange-500 to-rose-500',
-    link: 'https://bugbounty-ai.netlify.app/',
-  },
-]
+import { useState } from 'react'
+import { projects } from '../lib/data'
+import Reveal, { StaggerContainer, StaggerItem } from './ui/Reveal'
+import SectionHeading from './ui/SectionHeading'
+import MagneticButton from './ui/MagneticButton'
 
 export default function Work() {
   const [selectedImage, setSelectedImage] = useState<string | null>(null)
-  const cardsRef = useRef<(HTMLDivElement | null)[]>([])
-
-  useEffect(() => {
-    const handleMouseMove = (e: MouseEvent, card: HTMLDivElement) => {
-      const rect = card.getBoundingClientRect()
-      const x = e.clientX - rect.left
-      const y = e.clientY - rect.top
-
-      const centerX = rect.width / 2
-      const centerY = rect.height / 2
-
-      const rotateX = ((y - centerY) / centerY) * -8
-      const rotateY = ((x - centerX) / centerX) * 8
-
-      card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`
-    }
-
-    const handleMouseLeave = (card: HTMLDivElement) => {
-      card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale3d(1, 1, 1)'
-    }
-
-    cardsRef.current.forEach((card) => {
-      if (card) {
-        card.addEventListener('mousemove', (e) => handleMouseMove(e, card))
-        card.addEventListener('mouseleave', () => handleMouseLeave(card))
-      }
-    })
-
-    return () => {
-      cardsRef.current.forEach((card) => {
-        if (card) {
-          card.removeEventListener('mousemove', (e) => handleMouseMove(e, card as HTMLDivElement))
-          card.removeEventListener('mouseleave', () => handleMouseLeave(card as HTMLDivElement))
-        }
-      })
-    }
-  }, [])
 
   return (
-    <section id="work" className="py-32 relative overflow-hidden">
-      {/* Decorative background blooms */}
-      <div className="absolute top-[20%] left-[-10%] w-[500px] h-[500px] bg-primary/5 rounded-full blur-[120px] pointer-events-none"></div>
-      <div className="absolute bottom-[20%] right-[-10%] w-[500px] h-[500px] bg-purple-600/5 rounded-full blur-[120px] pointer-events-none"></div>
+    <section id="work" className="py-32 md:py-40 relative overflow-hidden">
+      <div className="absolute top-[15%] left-[-5%] w-[400px] h-[400px] bg-accent/5 rounded-full blur-[120px] pointer-events-none" />
 
       <div className="container mx-auto px-6 max-w-7xl relative z-10">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-24 reveal">
-          <div className="max-w-2xl">
-            <h2 className="font-display text-5xl md:text-8xl font-bold text-slate-900 dark:text-white leading-[0.9] tracking-tighter">
-              Selected<br />Experience<span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-purple-600">.</span>
-            </h2>
-          </div>
-          <p className="text-slate-500 text-lg md:text-xl max-w-sm mt-8 md:mt-0 md:text-right font-medium">
-            Merging logic with aesthetic to build products that matter.
-          </p>
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-8 mb-20 md:mb-28">
+          <SectionHeading
+            title={'Selected\nWork'}
+            subtitle="Case studies merging logic with aesthetic — products built to matter."
+          />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 lg:gap-24">
-          {projects.map((project, index) => (
-            <div
+        <StaggerContainer className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8" stagger={0.15}>
+          {projects.map((project) => (
+            <StaggerItem
               key={project.id}
-              className={`group reveal ${project.offset ? 'md:mt-32' : ''}`}
-              style={{ transitionDelay: `${index * 100}ms` }}
-              onClick={() => project.isModal && setSelectedImage(project.image)}
+              className={project.span === 'large' ? 'md:col-span-2' : ''}
             >
-              <div
-                ref={(el) => {
-                  cardsRef.current[index] = el
-                }}
-                className={`relative w-full aspect-[16/11] rounded-[2.5rem] overflow-hidden bg-slate-100 dark:bg-white/[0.03] border border-slate-200 dark:border-white/[0.08] transition-all duration-500 shadow-2xl shadow-black/5 dark:shadow-black/20 group-hover:shadow-primary/10 group-hover:border-primary/20 ${project.isModal ? 'cursor-zoom-in' : ''}`}
+              <motion.article
+                className="group relative"
+                whileHover={{ y: -6 }}
+                transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
               >
-                {/* Image Parallax Container */}
-                <div className="absolute inset-0 overflow-hidden">
-                  <img
-                    src={project.image}
-                    alt={project.alt}
-                    className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
+                <div
+                  className={`relative overflow-hidden rounded-3xl glass-card ${
+                    project.span === 'large' ? 'aspect-[21/9] md:aspect-[2.4/1]' : 'aspect-[16/10]'
+                  } ${project.isModal ? 'cursor-zoom-in' : ''}`}
+                  onClick={() => project.isModal && setSelectedImage(project.image)}
+                  data-cursor="pointer"
+                >
+                  <motion.div
+                    className="absolute inset-0"
+                    whileHover={{ scale: 1.05 }}
+                    transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+                  >
+                    <Image
+                      src={project.image}
+                      alt={project.alt}
+                      fill
+                      className="object-cover"
+                      sizes={project.span === 'large' ? '100vw' : '(max-width: 768px) 100vw, 50vw'}
+                    />
+                  </motion.div>
+
+                  <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/20 to-transparent opacity-80 group-hover:opacity-70 transition-opacity duration-500" />
+                  <div
+                    className={`absolute inset-0 bg-gradient-to-br ${project.color} opacity-0 group-hover:opacity-100 transition-opacity duration-700`}
                   />
-                  {/* Overlay Gradient */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/0 to-transparent opacity-60 group-hover:opacity-40 transition-opacity duration-500"></div>
-                </div>
 
-                {/* Floating Category Tag */}
-                <div className="absolute top-6 left-6 z-20">
-                  <span className="px-4 py-2 bg-white/10 backdrop-blur-md border border-white/20 rounded-full text-[10px] font-bold uppercase tracking-widest text-white">
-                    {project.category}
-                  </span>
-                </div>
+                  <div className="absolute inset-0 flex flex-col justify-between p-6 md:p-8 z-10">
+                    <div className="flex justify-between items-start">
+                      <span className="px-3 py-1.5 rounded-full text-[10px] font-semibold uppercase tracking-widest bg-white/10 backdrop-blur-md border border-white/10 text-foreground/90">
+                        {project.category}
+                      </span>
+                      <span className="text-[10px] font-mono text-muted/80">
+                        0{project.id}
+                      </span>
+                    </div>
 
-                {/* Hover Glow Effect */}
-                <div className={`absolute inset-0 bg-gradient-to-br ${project.color} opacity-0 group-hover:opacity-10 transition-opacity duration-500`}></div>
-              </div>
-
-              {/* Project Details */}
-              <div className="mt-8 flex justify-between items-start px-2">
-                <div className="flex-1 pr-8">
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className={`w-2 h-2 rounded-full bg-gradient-to-r ${project.color}`}></div>
-                    <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500">Project {project.id < 10 ? `0${project.id}` : project.id}</span>
+                    <div className="flex flex-wrap gap-2 mb-4 opacity-0 group-hover:opacity-100 translate-y-4 group-hover:translate-y-0 transition-all duration-500">
+                      {project.tags.map((tag) => (
+                        <span
+                          key={tag}
+                          className="px-3 py-1 text-[11px] font-medium rounded-full bg-white/10 backdrop-blur-sm border border-white/[0.08] text-foreground/80"
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
                   </div>
-                  {project.isModal ? (
-                    <button
-                      onClick={() => setSelectedImage(project.image)}
-                      className="text-left w-full"
-                    >
-                      <h3 className="text-3xl md:text-4xl font-display font-bold text-slate-900 dark:text-white mb-3 group-hover:text-primary transition-colors duration-300 tracking-tight">
-                        {project.title}
-                      </h3>
-                    </button>
-                  ) : (
+
+                  <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-20 pointer-events-none">
+                    <div className="flex gap-3 pointer-events-auto">
+                      {project.link && (
+                        <Link
+                          href={project.link}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          onClick={(e) => e.stopPropagation()}
+                          className="px-5 py-2.5 rounded-full bg-foreground text-bg text-sm font-semibold hover:shadow-glow-sm transition-shadow duration-300"
+                          data-cursor="pointer"
+                        >
+                          Live Preview
+                        </Link>
+                      )}
+                      {project.isModal && (
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            setSelectedImage(project.image)
+                          }}
+                          className="px-5 py-2.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-sm font-semibold text-foreground hover:bg-white/20 transition-colors"
+                          data-cursor="pointer"
+                        >
+                          View Full
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-6 flex justify-between items-start gap-4 px-1">
+                  <div>
+                    <h3 className="font-display text-2xl md:text-3xl font-bold text-foreground tracking-tight group-hover:text-accent transition-colors duration-500">
+                      {project.title}
+                    </h3>
+                    <p className="mt-2 text-muted text-sm md:text-base max-w-md leading-relaxed font-light">
+                      {project.description}
+                    </p>
+                  </div>
+                  {(project.link || project.isModal) && (
                     <Link
                       href={project.link || '#'}
-                      target={project.link?.startsWith('http') ? '_blank' : undefined}
-                      rel={project.link?.startsWith('http') ? 'noopener noreferrer' : undefined}
+                      target={project.link ? '_blank' : undefined}
+                      rel={project.link ? 'noopener noreferrer' : undefined}
+                      onClick={(e) => {
+                        if (project.isModal) {
+                          e.preventDefault()
+                          setSelectedImage(project.image)
+                        }
+                      }}
+                      className="flex-shrink-0 w-12 h-12 rounded-full border border-white/10 flex items-center justify-center text-muted group-hover:border-accent/40 group-hover:text-accent group-hover:bg-accent/10 transition-all duration-500 group-hover:rotate-45"
+                      data-cursor="pointer"
                     >
-                      <h3 className="text-3xl md:text-4xl font-display font-bold text-slate-900 dark:text-white mb-3 group-hover:text-primary transition-colors duration-300 tracking-tight">
-                        {project.title}
-                      </h3>
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M7 17L17 7M17 7H7M17 7V17" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
                     </Link>
                   )}
-                  <p className="text-slate-500 dark:text-slate-400 text-base md:text-lg leading-relaxed max-w-md">
-                    {project.description}
-                  </p>
                 </div>
-
-                {project.isModal ? (
-                  <button
-                    onClick={() => setSelectedImage(project.image)}
-                    className="w-14 h-14 md:w-16 md:h-16 rounded-full border border-slate-200 dark:border-white/10 flex items-center justify-center group-hover:bg-primary group-hover:border-primary group-hover:text-white transition-all duration-500 group-hover:scale-110 group-hover:-rotate-45"
-                  >
-                    <svg
-                      width="24"
-                      height="24"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="w-6 h-6 md:w-7 md:h-7"
-                    >
-                      <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
-                  </button>
-                ) : (
-                  <Link
-                    href={project.link || '#'}
-                    target={project.link?.startsWith('http') ? '_blank' : undefined}
-                    rel={project.link?.startsWith('http') ? 'noopener noreferrer' : undefined}
-                    className="w-14 h-14 md:w-16 md:h-16 rounded-full border border-slate-200 dark:border-white/10 flex items-center justify-center group-hover:bg-primary group-hover:border-primary group-hover:text-white transition-all duration-500 group-hover:scale-110 group-hover:-rotate-45"
-                  >
-                    <svg
-                      width="24"
-                      height="24"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="w-6 h-6 md:w-7 md:h-7"
-                    >
-                      <path d="M7 17L17 7M17 7H7M17 7V17" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
-                  </Link>
-                )}
-              </div>
-            </div>
+              </motion.article>
+            </StaggerItem>
           ))}
-        </div>
+        </StaggerContainer>
 
-        <div className="flex justify-center mt-32 reveal">
-          <Link
-            href="#"
-            className="group relative px-12 py-5 bg-slate-900 dark:bg-white text-white dark:text-black rounded-full font-bold text-lg overflow-hidden transition-all duration-300 hover:shadow-[0_0_40px_rgba(59,130,246,0.3)]"
-          >
-            <span className="relative z-10">Archive & More Work</span>
-            <div className="absolute inset-0 bg-gradient-to-r from-primary to-purple-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-          </Link>
-        </div>
+        <Reveal className="flex justify-center mt-20">
+          <MagneticButton href="https://github.com/beymax11" variant="secondary" external>
+            View GitHub
+            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
+            </svg>
+          </MagneticButton>
+        </Reveal>
       </div>
 
-      {/* Image Modal */}
-      {selectedImage && (
-        <div
-          className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-12 animate-in fade-in duration-300"
-          onClick={() => setSelectedImage(null)}
-        >
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-xl"></div>
-          <div className="relative max-w-7xl max-h-full overflow-hidden rounded-3xl shadow-2xl border border-white/10 animate-in zoom-in-95 duration-300">
-            <button
-              className="absolute top-6 right-6 w-12 h-12 rounded-full bg-black/50 text-white flex items-center justify-center backdrop-blur-md border border-white/10 hover:bg-black/80 transition-colors z-50"
-              onClick={() => setSelectedImage(null)}
-            >
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </button>
-            <img
-              src={selectedImage}
-              alt="Project View"
-              className="w-full h-auto object-contain max-h-[85vh]"
+      <AnimatePresence>
+        {selectedImage && (
+          <motion.div
+            className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-12"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setSelectedImage(null)}
+          >
+            <div className="absolute inset-0 bg-bg/80 backdrop-blur-2xl" />
+            <motion.div
+              className="relative max-w-6xl w-full rounded-2xl overflow-hidden border border-white/10 shadow-premium"
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
               onClick={(e) => e.stopPropagation()}
-            />
-          </div>
-        </div>
-      )}
+            >
+              <button
+                type="button"
+                className="absolute top-4 right-4 z-50 w-10 h-10 rounded-full bg-white/10 backdrop-blur-md border border-white/10 flex items-center justify-center text-foreground hover:bg-white/20 transition-colors"
+                onClick={() => setSelectedImage(null)}
+                data-cursor="pointer"
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M18 6L6 18M6 6l12 12" strokeLinecap="round" />
+                </svg>
+              </button>
+              <img src={selectedImage} alt="Project preview" className="w-full h-auto max-h-[85vh] object-contain" />
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </section>
   )
 }
