@@ -228,7 +228,7 @@ export default function Hero() {
               >
                 <div className="w-full h-full rounded-full overflow-hidden relative bg-black/40">
                   <Image
-                    src="/river.jpg"
+                    src="/river.JPG"
                     alt="Rim Vernon Dimaandal"
                     width={360}
                     height={360}
