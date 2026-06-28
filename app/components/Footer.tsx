@@ -9,7 +9,7 @@ import { socialLinks } from '../lib/data'
 
 export default function Footer() {
   return (
-    <footer id="contact" className="relative py-32 md:py-48 overflow-hidden">
+    <footer id="contact" className="relative pt-16 md:pt-24 pb-32 md:pb-48 overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-t from-accent/10 via-transparent to-transparent pointer-events-none" />
       <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-accent/15 rounded-full blur-[160px] pointer-events-none" />
 

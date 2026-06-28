@@ -1,6 +1,6 @@
 'use client'
 
-import { motion, useScroll, useTransform } from 'framer-motion'
+import { motion, useScroll, useTransform, useMotionValue, useSpring } from 'framer-motion'
 import Image from 'next/image'
 import { useRef } from 'react'
 import FloatingOrbs from './effects/FloatingOrbs'
@@ -24,6 +24,38 @@ export default function Hero() {
   const { scrollYProgress } = useScroll({ target: sectionRef, offset: ['start start', 'end start'] })
   const y = useTransform(scrollYProgress, [0, 1], [0, 120])
   const opacity = useTransform(scrollYProgress, [0, 0.5], [1, 0])
+
+  // Mouse hover 3D tilt & parallax effects
+  const xVal = useMotionValue(0)
+  const yVal = useMotionValue(0)
+
+  const springConfig = { damping: 25, stiffness: 150, mass: 0.5 }
+  const xSpring = useSpring(xVal, springConfig)
+  const ySpring = useSpring(yVal, springConfig)
+
+  const rotateX = useTransform(ySpring, [-0.5, 0.5], [15, -15])
+  const rotateY = useTransform(xSpring, [-0.5, 0.5], [-15, 15])
+
+  const layer2X = useTransform(xSpring, [-0.5, 0.5], [-12, 12])
+  const layer2Y = useTransform(ySpring, [-0.5, 0.5], [-12, 12])
+
+  const layer3X = useTransform(xSpring, [-0.5, 0.5], [12, -12])
+  const layer3Y = useTransform(ySpring, [-0.5, 0.5], [12, -12])
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect()
+    const width = rect.width
+    const height = rect.height
+    const mouseX = e.clientX - rect.left - width / 2
+    const mouseY = e.clientY - rect.top - height / 2
+    xVal.set(mouseX / width)
+    yVal.set(mouseY / height)
+  }
+
+  const handleMouseLeave = () => {
+    xVal.set(0)
+    yVal.set(0)
+  }
 
   return (
     <section
@@ -71,9 +103,8 @@ export default function Hero() {
                     variants={lineVariants}
                     initial="hidden"
                     animate="visible"
-                    className={`block text-[clamp(2.5rem,8vw,5.5rem)] ${
-                      i === 1 ? 'text-gradient-accent' : 'text-foreground'
-                    }`}
+                    className={`block text-[clamp(2.5rem,8vw,5.5rem)] ${i === 1 ? 'text-gradient-accent' : 'text-foreground'
+                      }`}
                   >
                     {line}
                     {i === 2 && '.'}
@@ -105,7 +136,7 @@ export default function Hero() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                 </svg>
               </MagneticButton>
-              <MagneticButton href="/resume.pdf" download="resume.pdf" variant="secondary">
+              <MagneticButton href="/Resume-Dimaandal.pdf" download="Resume-Dimaandal.pdf" variant="secondary">
                 Download Resume
               </MagneticButton>
             </motion.div>
@@ -128,28 +159,89 @@ export default function Hero() {
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 2.2, duration: 1, ease: [0.16, 1, 0.3, 1] }}
           >
-            <div className="relative">
-              <div className="absolute inset-0 rounded-full bg-accent/20 blur-3xl scale-110 animate-pulse-glow" />
+            <div
+              className="relative group cursor-none"
+              style={{ perspective: 1000 }}
+              onMouseMove={handleMouseMove}
+              onMouseLeave={handleMouseLeave}
+            >
+              {/* Outer Ambient Glow */}
+              <div className="absolute inset-0 rounded-full bg-accent/25 blur-3xl scale-110 animate-pulse-glow" />
+
+              {/* Parallax Outer Tech Ring (Dashed, clockwise spin) */}
               <motion.div
-                className="relative w-[280px] h-[280px] md:w-[360px] md:h-[360px] rounded-full overflow-hidden border border-white/[0.08] shadow-premium"
-                whileHover={{ scale: 1.03 }}
+                className="absolute -inset-8 rounded-full border border-dashed border-accent/20 pointer-events-none"
+                style={{ x: layer2X, y: layer2Y }}
+                animate={{ rotate: 360 }}
+                transition={{ duration: 40, repeat: Infinity, ease: 'linear' }}
+              />
+
+              {/* Parallax Middle Tech Ring (Solid, counter-clockwise spin) */}
+              <motion.div
+                className="absolute -inset-5 rounded-full border border-white/[0.05] pointer-events-none"
+                style={{ x: layer3X, y: layer3Y }}
+                animate={{ rotate: -360 }}
+                transition={{ duration: 25, repeat: Infinity, ease: 'linear' }}
+              />
+
+              {/* Parallax Outer HUD Brackets */}
+              <motion.div
+                className="absolute -inset-6 pointer-events-none opacity-40 group-hover:opacity-100 transition-opacity duration-500"
+                style={{ x: layer3X, y: layer3Y }}
+              >
+                {/* Top-Left Bracket */}
+                <div className="absolute top-0 left-0 w-5 h-5 border-t-2 border-l-2 border-accent/40 rounded-tl-lg group-hover:border-accent group-hover:translate-x-1 group-hover:translate-y-1 transition-all duration-500" />
+                {/* Top-Right Bracket */}
+                <div className="absolute top-0 right-0 w-5 h-5 border-t-2 border-r-2 border-accent/40 rounded-tr-lg group-hover:border-accent group-hover:-translate-x-1 group-hover:translate-y-1 transition-all duration-500" />
+                {/* Bottom-Left Bracket */}
+                <div className="absolute bottom-0 left-0 w-5 h-5 border-b-2 border-l-2 border-accent/40 rounded-bl-lg group-hover:border-accent group-hover:translate-x-1 group-hover:-translate-y-1 transition-all duration-500" />
+                {/* Bottom-Right Bracket */}
+                <div className="absolute bottom-0 right-0 w-5 h-5 border-b-2 border-r-2 border-accent/40 rounded-br-lg group-hover:border-accent group-hover:-translate-x-1 group-hover:-translate-y-1 transition-all duration-500" />
+              </motion.div>
+
+              {/* Tech Badges */}
+              <motion.div
+                className="absolute -top-2 -left-2 glass-card px-2.5 py-1 rounded-full border border-white/[0.08] shadow-lg flex items-center gap-1.5 z-20 pointer-events-none text-[9px] font-mono tracking-widest text-muted"
+                style={{ x: layer3X, y: layer3Y }}
+              >
+                <span>v2026.06</span>
+              </motion.div>
+
+              <motion.div
+                className="absolute -bottom-2 -right-2 glass-card px-3 py-1 rounded-full border border-white/[0.08] shadow-lg flex items-center gap-1.5 z-20 pointer-events-none text-[10px] font-mono tracking-widest text-accent"
+                style={{ x: layer2X, y: layer2Y }}
+              >
+                <span className="h-1.5 w-1.5 rounded-full bg-accent animate-pulse" />
+                <span>DEV_MODE</span>
+              </motion.div>
+
+              {/* Main Image Frame (3D Tilting Card) */}
+              <motion.div
+                className="relative w-[280px] h-[280px] md:w-[360px] md:h-[360px] rounded-full p-[3px] bg-gradient-to-tr from-accent via-violet-500/50 to-emerald-400/30 shadow-premium overflow-hidden cursor-none"
+                style={{
+                  rotateX,
+                  rotateY,
+                  transformStyle: 'preserve-3d',
+                }}
+                whileHover={{ scale: 1.02 }}
                 transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
               >
-                <Image
-                  src="/rim.jpg"
-                  alt="Rim Vernon Dimaandal"
-                  width={360}
-                  height={360}
-                  className="w-full h-full object-cover"
-                  priority
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-bg/60 via-transparent to-transparent" />
+                <div className="w-full h-full rounded-full overflow-hidden relative bg-black/40">
+                  <Image
+                    src="/river.jpg"
+                    alt="Rim Vernon Dimaandal"
+                    width={360}
+                    height={360}
+                    className="w-full h-full object-cover transition-transform duration-700 ease-out scale-100 group-hover:scale-105"
+                    priority
+                  />
+                  {/* Subtle glass reflection overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-tr from-accent/0 via-white/[0.05] to-accent/0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-out pointer-events-none" />
+                  
+                  {/* Ambient gradient overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-bg/80 via-transparent to-transparent group-hover:opacity-40 transition-opacity duration-500" />
+                </div>
               </motion.div>
-              <motion.div
-                className="absolute -inset-4 rounded-full border border-white/[0.06]"
-                animate={{ rotate: 360 }}
-                transition={{ duration: 30, repeat: Infinity, ease: 'linear' }}
-              />
             </div>
           </motion.div>
         </div>

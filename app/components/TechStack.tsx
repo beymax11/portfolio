@@ -7,7 +7,7 @@ import { StaggerContainer, StaggerItem } from './ui/Reveal'
 
 export default function TechStack() {
   return (
-    <section id="stack" className="py-32 md:py-40 relative overflow-hidden">
+    <section id="stack" className="pt-16 md:pt-20 pb-16 md:pb-20 relative overflow-hidden">
       <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-accent/5 rounded-full blur-[140px] pointer-events-none" />
 
       <div className="container mx-auto px-6 max-w-7xl relative z-10">
