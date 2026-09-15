@@ -3,61 +3,70 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useCallback } from 'react'
 import { projects } from '../lib/data'
 import Reveal from './ui/Reveal'
 import SectionHeading from './ui/SectionHeading'
 import MagneticButton from './ui/MagneticButton'
 
-const categories = ['All', 'E-Commerce', 'SaaS Dashboard', 'AI Application'] as const
-
 export default function Work() {
   const [selectedImage, setSelectedImage] = useState<string | null>(null)
-  const [activeCategory, setActiveCategory] = useState<string>('All')
   const [activeIndex, setActiveIndex] = useState(0)
   const scrollRef = useRef<HTMLDivElement>(null)
 
-  // Reset index and scroll position when filter tab changes
-  useEffect(() => {
-    setActiveIndex(0)
-    if (scrollRef.current) {
-      scrollRef.current.scrollLeft = 0
-    }
-  }, [activeCategory])
-
-  const handleScroll = () => {
+  const handleScroll = useCallback(() => {
     if (!scrollRef.current) return
     const container = scrollRef.current
     const scrollLeft = container.scrollLeft
     const children = container.children
+
     if (children.length > 0) {
-      const cardWidth = children[0].clientWidth
-      const itemWidth = cardWidth + 20 // cardWidth + gap (gap-5 is 20px)
-      const newIndex = Math.round(scrollLeft / itemWidth)
-      if (newIndex >= 0 && newIndex < filteredProjects.length && newIndex !== activeIndex) {
-        setActiveIndex(newIndex)
+      let closestIndex = 0
+      let minDistance = Infinity
+
+      for (let i = 0; i < children.length; i++) {
+        const child = children[i] as HTMLElement
+        const childCenter = child.offsetLeft + child.offsetWidth / 2
+        const containerCenter = scrollLeft + container.offsetWidth / 2
+        const distance = Math.abs(childCenter - containerCenter)
+
+        if (distance < minDistance) {
+          minDistance = distance
+          closestIndex = i
+        }
+      }
+
+      if (closestIndex !== activeIndex) {
+        setActiveIndex(closestIndex)
       }
     }
-  }
+  }, [activeIndex])
 
   const scrollToIndex = (index: number) => {
     if (!scrollRef.current) return
     const container = scrollRef.current
     const children = container.children
-    if (children.length > 0) {
-      const cardWidth = children[0].clientWidth
-      const itemWidth = cardWidth + 20 // cardWidth + gap
+
+    if (children[index]) {
+      const child = children[index] as HTMLElement
+      const targetScroll = child.offsetLeft - (container.offsetWidth - child.offsetWidth) / 2
       container.scrollTo({
-        left: index * itemWidth,
+        left: targetScroll,
         behavior: 'smooth',
       })
       setActiveIndex(index)
     }
   }
 
-  const filteredProjects = activeCategory === 'All'
-    ? projects
-    : projects.filter((project) => project.category === activeCategory)
+  const handlePrev = () => {
+    const nextIdx = activeIndex > 0 ? activeIndex - 1 : projects.length - 1
+    scrollToIndex(nextIdx)
+  }
+
+  const handleNext = () => {
+    const nextIdx = activeIndex < projects.length - 1 ? activeIndex + 1 : 0
+    scrollToIndex(nextIdx)
+  }
 
   return (
     <section id="work" className="pt-32 md:pt-40 pb-16 md:pb-20 relative overflow-hidden">
@@ -66,222 +75,139 @@ export default function Work() {
       <div className="absolute bottom-[20%] right-[-5%] w-[350px] h-[350px] bg-violet-600/5 rounded-full blur-[100px] pointer-events-none" />
 
       <div className="container mx-auto px-6 max-w-7xl relative z-10">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-8 mb-12 md:mb-16">
+        {/* Section Header with Carousel Navigation */}
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-10 md:mb-14">
           <SectionHeading
             title={'Selected\nWork'}
             subtitle="Case studies merging logic with aesthetic — products built to matter."
           />
+
+          {/* Controls: Counter + Arrow Navigation */}
+          <div className="flex items-center gap-3 self-end md:self-auto">
+            <div className="text-xs font-mono text-muted tracking-widest px-3.5 py-2 rounded-full border border-white/[0.08] bg-white/[0.02] backdrop-blur-sm">
+              <span className="text-accent font-semibold">
+                {String(activeIndex + 1).padStart(2, '0')}
+              </span>
+              <span className="opacity-30 mx-1.5">/</span>
+              <span>{String(projects.length).padStart(2, '0')}</span>
+            </div>
+
+            <button
+              type="button"
+              onClick={handlePrev}
+              className="w-11 h-11 rounded-full border border-white/10 bg-white/[0.02] hover:bg-accent/10 hover:border-accent/40 text-foreground hover:text-accent transition-all duration-300 flex items-center justify-center group"
+              aria-label="Previous project"
+              data-cursor="pointer"
+            >
+              <svg
+                className="w-4 h-4 transition-transform duration-300 group-hover:-translate-x-0.5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={2}
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+              </svg>
+            </button>
+
+            <button
+              type="button"
+              onClick={handleNext}
+              className="w-11 h-11 rounded-full border border-white/10 bg-white/[0.02] hover:bg-accent/10 hover:border-accent/40 text-foreground hover:text-accent transition-all duration-300 flex items-center justify-center group"
+              aria-label="Next project"
+              data-cursor="pointer"
+            >
+              <svg
+                className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-0.5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={2}
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+              </svg>
+            </button>
+          </div>
         </div>
 
-        {/* Filter Navigation */}
-        <Reveal delay={0.1}>
-          <div className="flex flex-wrap justify-start gap-2.5 mb-12 md:mb-16 pb-2 border-b border-white/[0.04]">
-            {categories.map((category) => (
-              <button
-                key={category}
-                type="button"
-                onClick={() => setActiveCategory(category)}
-                className={`relative px-5 py-2.5 rounded-full text-xs font-medium tracking-wide transition-all duration-300 border ${
-                  activeCategory === category
-                    ? 'bg-accent/10 border-accent/30 text-foreground shadow-glow-sm'
-                    : 'bg-white/[0.01] border-white/[0.05] text-muted hover:border-white/10 hover:text-foreground'
-                }`}
-                data-cursor="pointer"
+        {/* Carousel Container */}
+        <div className="relative -mx-6 px-6">
+          <div
+            ref={scrollRef}
+            onScroll={handleScroll}
+            className="flex overflow-x-auto snap-x snap-mandatory gap-6 md:gap-8 pb-4 scrollbar-none scroll-smooth items-stretch"
+            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+          >
+            {projects.map((project, idx) => (
+              <div
+                key={project.id}
+                className="snap-center shrink-0 w-[88vw] sm:w-[82vw] md:w-[720px] lg:w-[980px] xl:w-[1100px] first:ml-0 last:mr-0"
               >
-                {category}
-                {activeCategory === category && (
-                  <motion.span
-                    layoutId="activeFilterGlow"
-                    className="absolute inset-0 rounded-full bg-accent/5 -z-10 pointer-events-none"
-                    transition={{ type: 'spring', stiffness: 380, damping: 30 }}
-                  />
-                )}
-              </button>
-            ))}
-          </div>
-        </Reveal>
+                <article className="group relative glass-card rounded-[28px] md:rounded-[36px] border border-white/[0.07] bg-white/[0.02] p-5 sm:p-6 md:p-8 lg:p-10 transition-all duration-500 hover:border-accent/40 hover:bg-white/[0.04] hover:shadow-glow flex flex-col justify-between h-full">
+                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-10 items-center">
+                    {/* Image Column */}
+                    <div
+                      className="lg:col-span-7 relative aspect-[16/10] w-full rounded-2xl overflow-hidden cursor-pointer bg-white/[0.02] border border-white/[0.05]"
+                      onClick={() => project.isModal && setSelectedImage(project.image)}
+                    >
+                      <motion.div
+                        className="absolute inset-0"
+                        whileHover={{ scale: 1.03 }}
+                        transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+                      >
+                        <Image
+                          src={project.image}
+                          alt={project.alt}
+                          fill
+                          className="object-cover"
+                          sizes="(max-width: 768px) 90vw, (max-width: 1200px) 60vw, 700px"
+                          priority={idx === 0}
+                        />
+                      </motion.div>
 
-        {/* Works Grid (Desktop) */}
-        <motion.div 
-          layout 
-          className="hidden md:grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8"
-        >
-          <AnimatePresence mode="popLayout">
-            {filteredProjects.map((project) => {
-              const isLarge = project.span === 'large'
-              return (
-                <motion.div
-                  key={project.id}
-                  layout
-                  initial={{ opacity: 0, scale: 0.95, y: 20 }}
-                  animate={{ opacity: 1, scale: 1, y: 0 }}
-                  exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                  transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-                  className={isLarge ? 'md:col-span-2' : ''}
-                >
-                  {isLarge ? (
-                    /* Large Card Layout (Split grid on desktop) */
-                    <article className="group relative glass-card rounded-[32px] border border-white/[0.06] bg-white/[0.02] p-5 md:p-6 lg:p-8 transition-all duration-500 hover:border-accent/40 hover:bg-white/[0.04] hover:shadow-glow flex flex-col justify-between">
-                      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-center">
-                        {/* Left Column: Image */}
-                        <div 
-                          className="lg:col-span-7 relative aspect-[16/10] lg:aspect-[1.5/1] xl:aspect-[1.7/1] w-full rounded-2xl overflow-hidden cursor-pointer"
-                          onClick={() => project.isModal && setSelectedImage(project.image)}
-                        >
-                          <motion.div
-                            className="absolute inset-0"
-                            whileHover={{ scale: 1.04 }}
-                            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-                          >
-                            <Image
-                              src={project.image}
-                              alt={project.alt}
-                              fill
-                              className="object-cover"
-                              sizes="100vw"
-                            />
-                          </motion.div>
-                          
-                          {/* Shimmer and Overlay effects */}
-                          <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/25 to-transparent opacity-60 group-hover:opacity-40 transition-opacity duration-500" />
-                          <div className={`absolute inset-0 bg-gradient-to-br ${project.color} opacity-0 group-hover:opacity-30 transition-opacity duration-700 pointer-events-none`} />
-                          <div className="absolute inset-0 bg-gradient-to-tr from-accent/0 via-white/[0.05] to-accent/0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-out pointer-events-none" />
-                        </div>
+                      {/* Shimmer and Overlay effects */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-bg/90 via-bg/20 to-transparent opacity-60 group-hover:opacity-30 transition-opacity duration-500" />
+                      <div
+                        className={`absolute inset-0 bg-gradient-to-br ${project.color} opacity-0 group-hover:opacity-25 transition-opacity duration-700 pointer-events-none`}
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-tr from-accent/0 via-white/[0.04] to-accent/0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-out pointer-events-none" />
+                    </div>
 
-                        {/* Right Column: Text and links */}
-                        <div className="lg:col-span-5 flex flex-col justify-between h-full min-h-[300px]">
-                          <div>
-                            <div className="flex justify-between items-center mb-6">
-                              <span className="px-3 py-1 rounded-full text-[10px] font-mono uppercase tracking-widest bg-accent/10 border border-accent/20 text-accent">
-                                {project.category}
-                              </span>
-                              <span className="text-[11px] font-mono text-muted/50">
-                                // 0{project.id}
-                              </span>
-                            </div>
-
-                            <h3 className="font-display text-2xl md:text-3xl font-bold text-foreground tracking-tight group-hover:text-accent transition-colors duration-300">
-                              {project.title}
-                            </h3>
-
-                            <p className="mt-4 text-muted text-sm md:text-base leading-relaxed font-light">
-                              {project.description}
-                            </p>
-                          </div>
-
-                          <div className="mt-8">
-                            <div className="flex flex-wrap gap-1.5 mb-6">
-                              {project.tags.map((tag) => (
-                                <span
-                                  key={tag}
-                                  className="text-[10px] px-2.5 py-1 rounded-md bg-white/[0.03] border border-white/[0.05] text-muted group-hover:text-foreground group-hover:border-white/[0.1] transition-all duration-300"
-                                >
-                                  {tag}
-                                </span>
-                              ))}
-                            </div>
-
-                            <div className="flex justify-between items-center pt-6 border-t border-white/[0.05]">
-                              <div className="flex gap-4">
-                                {project.link && (
-                                  <Link
-                                    href={project.link}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="text-xs font-semibold tracking-wider uppercase text-foreground hover:text-accent transition-colors duration-300 flex items-center gap-1.5"
-                                    data-cursor="pointer"
-                                  >
-                                    Live Preview
-                                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                                      <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
-                                    </svg>
-                                  </Link>
-                                )}
-                                {project.isModal && (
-                                  <button
-                                    type="button"
-                                    onClick={() => setSelectedImage(project.image)}
-                                    className="text-xs font-semibold tracking-wider uppercase text-foreground hover:text-accent transition-colors duration-300 flex items-center gap-1.5"
-                                    data-cursor="pointer"
-                                  >
-                                    Zoom Image
-                                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                                      <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.637 10.637z" />
-                                    </svg>
-                                  </button>
-                                )}
-                              </div>
-
-                              <div className="w-9 h-9 rounded-full border border-white/10 flex items-center justify-center text-muted group-hover:border-accent/40 group-hover:text-accent group-hover:bg-accent/10 transition-all duration-500 group-hover:rotate-45">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                                  <path d="M7 17L17 7M17 7H7M17 7V17" strokeLinecap="round" strokeLinejoin="round" />
-                                </svg>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </article>
-                  ) : (
-                    /* Default Card Layout (Vertical stack) */
-                    <article className="group relative glass-card rounded-[32px] border border-white/[0.06] bg-white/[0.02] p-5 md:p-6 lg:p-8 transition-all duration-500 hover:border-accent/40 hover:bg-white/[0.04] hover:shadow-glow flex flex-col justify-between h-full">
+                    {/* Content Column */}
+                    <div className="lg:col-span-5 flex flex-col justify-between h-full">
                       <div>
-                        <div className="flex justify-between items-center mb-6">
-                          <span className="px-3 py-1 rounded-full text-[10px] font-mono uppercase tracking-widest bg-accent/10 border border-accent/20 text-accent">
+                        <div className="flex justify-between items-center mb-4 md:mb-6">
+                          <span className="px-3 py-1 rounded-full text-[10px] md:text-[11px] font-mono uppercase tracking-widest bg-accent/10 border border-accent/20 text-accent font-medium">
                             {project.category}
                           </span>
-                          <span className="text-[11px] font-mono text-muted/50">
+                          <span className="text-xs font-mono text-muted/60">
                             // 0{project.id}
                           </span>
                         </div>
 
-                        <div 
-                          className="relative aspect-[16/10] w-full rounded-2xl overflow-hidden mb-6 cursor-pointer"
-                          onClick={() => project.isModal && setSelectedImage(project.image)}
-                        >
-                          <motion.div
-                            className="absolute inset-0"
-                            whileHover={{ scale: 1.04 }}
-                            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-                          >
-                            <Image
-                              src={project.image}
-                              alt={project.alt}
-                              fill
-                              className="object-cover"
-                              sizes="(max-width: 768px) 100vw, 50vw"
-                            />
-                          </motion.div>
-                          
-                          {/* Shimmer and Overlay effects */}
-                          <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/25 to-transparent opacity-60 group-hover:opacity-40 transition-opacity duration-500" />
-                          <div className={`absolute inset-0 bg-gradient-to-br ${project.color} opacity-0 group-hover:opacity-30 transition-opacity duration-700 pointer-events-none`} />
-                          <div className="absolute inset-0 bg-gradient-to-tr from-accent/0 via-white/[0.05] to-accent/0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-out pointer-events-none" />
-                        </div>
-
-                        <h3 className="font-display text-2xl font-bold text-foreground tracking-tight group-hover:text-accent transition-colors duration-300">
+                        <h3 className="font-display text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground tracking-tight group-hover:text-accent transition-colors duration-300">
                           {project.title}
                         </h3>
 
-                        <p className="mt-3 text-muted text-sm leading-relaxed font-light mb-6">
+                        <p className="mt-3 md:mt-4 text-muted text-sm sm:text-base leading-relaxed font-light">
                           {project.description}
                         </p>
                       </div>
 
-                      <div className="mt-auto">
-                        <div className="flex flex-wrap gap-1.5 mb-6">
+                      <div className="mt-6 md:mt-8">
+                        <div className="flex flex-wrap gap-1.5 md:gap-2 mb-6">
                           {project.tags.map((tag) => (
                             <span
                               key={tag}
-                              className="text-[10px] px-2.5 py-1 rounded-md bg-white/[0.03] border border-white/[0.05] text-muted group-hover:text-foreground group-hover:border-white/[0.1] transition-all duration-300"
+                              className="text-[11px] px-3 py-1 rounded-md bg-white/[0.03] border border-white/[0.06] text-muted group-hover:text-foreground group-hover:border-white/[0.12] transition-all duration-300"
                             >
                               {tag}
                             </span>
                           ))}
                         </div>
 
-                        <div className="flex justify-between items-center pt-6 border-t border-white/[0.05]">
-                          <div className="flex gap-4">
+                        <div className="flex justify-between items-center pt-5 border-t border-white/[0.06]">
+                          <div className="flex items-center gap-4">
                             {project.link && (
                               <Link
                                 href={project.link}
@@ -291,8 +217,18 @@ export default function Work() {
                                 data-cursor="pointer"
                               >
                                 Live Preview
-                                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                                  <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+                                <svg
+                                  className="w-3.5 h-3.5"
+                                  fill="none"
+                                  viewBox="0 0 24 24"
+                                  stroke="currentColor"
+                                  strokeWidth={2}
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"
+                                  />
                                 </svg>
                               </Link>
                             )}
@@ -304,125 +240,40 @@ export default function Work() {
                                 data-cursor="pointer"
                               >
                                 Zoom Image
-                                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                                  <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.637 10.637z" />
+                                <svg
+                                  className="w-3.5 h-3.5"
+                                  fill="none"
+                                  viewBox="0 0 24 24"
+                                  stroke="currentColor"
+                                  strokeWidth={2}
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.637 10.637z"
+                                  />
                                 </svg>
                               </button>
                             )}
                           </div>
 
-                          <div className="w-9 h-9 rounded-full border border-white/10 flex items-center justify-center text-muted group-hover:border-accent/40 group-hover:text-accent group-hover:bg-accent/10 transition-all duration-500 group-hover:rotate-45">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                              <path d="M7 17L17 7M17 7H7M17 7V17" strokeLinecap="round" strokeLinejoin="round" />
+                          <div className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center text-muted group-hover:border-accent/40 group-hover:text-accent group-hover:bg-accent/10 transition-all duration-500 group-hover:rotate-45">
+                            <svg
+                              width="16"
+                              height="16"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2.5"
+                            >
+                              <path
+                                d="M7 17L17 7M17 7H7M17 7V17"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              />
                             </svg>
                           </div>
                         </div>
-                      </div>
-                    </article>
-                  )}
-                </motion.div>
-              )
-            })}
-          </AnimatePresence>
-        </motion.div>
-
-        {/* Works Carousel (Mobile Only) */}
-        <div className="block md:hidden">
-          <div 
-            ref={scrollRef}
-            onScroll={handleScroll}
-            className="flex overflow-x-auto snap-x snap-mandatory gap-5 pb-6 scrollbar-none px-4 -mx-6 scroll-smooth"
-            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-          >
-            {filteredProjects.map((project) => (
-              <div 
-                key={project.id}
-                className="snap-center shrink-0 first:ml-2 last:mr-2"
-              >
-                <article className="group relative glass-card rounded-[30px] border border-white/[0.06] bg-white/[0.02] p-5 transition-all duration-300 hover:border-accent/40 hover:bg-white/[0.04] flex flex-col justify-between h-[420px] w-[82vw] sm:w-[320px] shrink-0 snap-center">
-                  <div>
-                    {/* Header Row */}
-                    <div className="flex justify-between items-center mb-4">
-                      <span className="px-2.5 py-0.5 rounded-full text-[9px] font-mono uppercase tracking-widest bg-accent/10 border border-accent/20 text-accent">
-                        {project.category}
-                      </span>
-                      <span className="text-[10px] font-mono text-muted/50">
-                        // 0{project.id}
-                      </span>
-                    </div>
-
-                    {/* Image container */}
-                    <div 
-                      className="relative aspect-[16/10] w-full rounded-xl overflow-hidden mb-4 cursor-pointer"
-                      onClick={() => project.isModal && setSelectedImage(project.image)}
-                    >
-                      <Image
-                        src={project.image}
-                        alt={project.alt}
-                        fill
-                        className="object-cover"
-                        sizes="(max-width: 768px) 80vw, 300px"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/25 to-transparent opacity-60" />
-                      <div className={`absolute inset-0 bg-gradient-to-br ${project.color} opacity-0 group-hover:opacity-20 transition-opacity duration-700 pointer-events-none`} />
-                    </div>
-
-                    <h3 className="font-display text-xl font-bold text-foreground tracking-tight">
-                      {project.title}
-                    </h3>
-
-                    <p className="mt-2 text-muted text-xs leading-relaxed font-light line-clamp-2">
-                      {project.description}
-                    </p>
-                  </div>
-
-                  <div className="mt-4">
-                    <div className="flex flex-wrap gap-1 mb-4">
-                      {project.tags.slice(0, 3).map((tag) => (
-                        <span
-                          key={tag}
-                          className="text-[9px] px-2 py-0.5 rounded bg-white/[0.03] border border-white/[0.05] text-muted"
-                        >
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
-
-                    <div className="flex justify-between items-center pt-4 border-t border-white/[0.05]">
-                      <div className="flex gap-3">
-                        {project.link && (
-                          <Link
-                            href={project.link}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-[10px] font-semibold tracking-wider uppercase text-foreground hover:text-accent flex items-center gap-1"
-                            data-cursor="pointer"
-                          >
-                            Preview
-                            <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                              <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
-                            </svg>
-                          </Link>
-                        )}
-                        {project.isModal && (
-                          <button
-                            type="button"
-                            onClick={() => setSelectedImage(project.image)}
-                            className="text-[10px] font-semibold tracking-wider uppercase text-foreground hover:text-accent flex items-center gap-1"
-                            data-cursor="pointer"
-                          >
-                            Zoom
-                            <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                              <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.637 10.637z" />
-                            </svg>
-                          </button>
-                        )}
-                      </div>
-
-                      <div className="w-7 h-7 rounded-full border border-white/10 flex items-center justify-center text-muted group-hover:border-accent/40 group-hover:text-accent transition-all duration-300">
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                          <path d="M7 17L17 7M17 7H7M17 7V17" strokeLinecap="round" strokeLinejoin="round" />
-                        </svg>
                       </div>
                     </div>
                   </div>
@@ -430,28 +281,29 @@ export default function Work() {
               </div>
             ))}
           </div>
-
-          {/* Carousel Indicators */}
-          {filteredProjects.length > 1 && (
-            <div className="flex justify-center gap-2 mt-4">
-              {filteredProjects.map((project, idx) => (
-                <button
-                  key={project.id}
-                  type="button"
-                  onClick={() => scrollToIndex(idx)}
-                  className={`h-1.5 rounded-full transition-all duration-300 ${
-                    activeIndex === idx 
-                      ? 'w-5 bg-accent' 
-                      : 'w-1.5 bg-white/20'
-                  }`}
-                  aria-label={`Go to slide ${idx + 1}`}
-                />
-              ))}
-            </div>
-          )}
         </div>
 
-        <Reveal className="flex justify-center mt-20">
+        {/* Carousel Indicators */}
+        {projects.length > 1 && (
+          <div className="flex justify-center items-center gap-2.5 mt-8 md:mt-10">
+            {projects.map((project, idx) => (
+              <button
+                key={project.id}
+                type="button"
+                onClick={() => scrollToIndex(idx)}
+                className={`h-2 rounded-full transition-all duration-300 ${
+                  activeIndex === idx
+                    ? 'w-8 bg-accent shadow-glow-sm'
+                    : 'w-2 bg-white/20 hover:bg-white/40'
+                }`}
+                aria-label={`Go to slide ${idx + 1}`}
+                data-cursor="pointer"
+              />
+            ))}
+          </div>
+        )}
+
+        <Reveal className="flex justify-center mt-16 md:mt-20">
           <MagneticButton href="https://github.com/beymax11" variant="secondary" external>
             View GitHub
             <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
@@ -461,6 +313,7 @@ export default function Work() {
         </Reveal>
       </div>
 
+      {/* Modal Image Zoom */}
       <AnimatePresence>
         {selectedImage && (
           <motion.div
@@ -485,7 +338,7 @@ export default function Work() {
                 onClick={() => setSelectedImage(null)}
                 data-cursor="pointer"
               >
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
                   <path d="M18 6L6 18M6 6l12 12" strokeLinecap="round" />
                 </svg>
               </button>
