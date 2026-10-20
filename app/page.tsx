@@ -1,36 +1,43 @@
 'use client'
 
-import AmbientBackground from './components/effects/AmbientBackground'
-import CustomCursor from './components/effects/CustomCursor'
-import MouseGlow from './components/effects/MouseGlow'
-import NoiseOverlay from './components/effects/NoiseOverlay'
-import PageLoader from './components/effects/PageLoader'
-import ScrollProgress from './components/effects/ScrollProgress'
-import Footer from './components/Footer'
-import Hero from './components/Hero'
-import MailButton from './components/MailButton'
-import Navbar from './components/Navbar'
-import TechStack from './components/TechStack'
-import Work from './components/Work'
+import React, { useState } from 'react'
+import SmoothScrollProvider from '@/components/SmoothScroll'
+import Preloader from '@/components/Preloader'
+import SiteNav from '@/components/SiteNav'
+import Hero from '@/components/Hero'
+import Marquee from '@/components/Marquee'
+import Story from '@/components/Story'
+import Ventures from '@/components/Ventures'
+import Impact from '@/components/Impact'
+import Voices from '@/components/Voices'
+import ContactFooter from '@/components/ContactFooter'
+import { useAdaptiveScaling } from '@/hooks/useAdaptiveScaling'
+
+function HomeContent() {
+  const [heroReady, setHeroReady] = useState(false)
+  useAdaptiveScaling()
+
+  return (
+    <>
+      <Preloader onComplete={() => setHeroReady(true)} />
+      <SiteNav />
+      <main className="relative flex flex-col w-full bg-[#08080a]">
+        <Hero isReady={heroReady} />
+        <Marquee />
+        <Story />
+        <Ventures />
+        <Impact />
+        <Voices />
+        <ContactFooter />
+      </main>
+    </>
+  )
+}
 
 export default function Home() {
   return (
-    <>
-      <PageLoader />
-      <ScrollProgress />
-      <CustomCursor />
-      <MouseGlow />
-      <AmbientBackground />
-      <NoiseOverlay />
-
-      <main className="relative">
-        <Navbar />
-        <Hero />
-        <Work />
-        <TechStack />
-        <Footer />
-        <MailButton />
-      </main>
-    </>
+    <SmoothScrollProvider>
+      <HomeContent />
+    </SmoothScrollProvider>
   )
 }
