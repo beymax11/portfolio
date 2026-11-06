@@ -3,30 +3,34 @@
 import React, { useEffect, useRef, useState } from 'react'
 import Eyebrow from './Eyebrow'
 
-const PRINCIPLES = [
+const CAPABILITIES = [
   {
     num: '01',
-    title: "Move before it's obvious",
+    title: 'Frontend & Interactive UI',
     description:
-      'Innovation belongs to those who build ahead of trends. I adopt and master modern frameworks, design systems, and motion physics early.',
+      'Responsive interfaces, scalable component systems, and fluid micro-interactions crafted with modern React architectures that feel fast, intuitive, and alive.',
+    stack: 'Next.js · React · TypeScript · Tailwind CSS',
   },
   {
     num: '02',
-    title: 'Code with architectural rigor',
+    title: 'Full-Stack & E-Commerce',
     description:
-      'Scalable systems demand clean state management, modular component hierarchies, and bulletproof type safety.',
+      'Custom storefronts, booking platforms, and resilient backend APIs engineered for seamless checkouts, clean data modeling, and conversion-focused flows.',
+    stack: 'Golang · Node.js · PostgreSQL · Supabase · Shopify',
   },
   {
     num: '03',
-    title: 'Interaction is the product',
+    title: 'Mobile & Cross-Platform Apps',
     description:
-      'A digital experience isn\u2019t just how it looks; it\u2019s how it feels and moves. Fluid micro-animations and tactile feedback define premium software.',
+      'Native-feeling mobile and multi-platform applications built from a unified codebase, delivering smooth motion and reliable everyday performance.',
+    stack: 'Flutter · Cross-Platform UI · Realtime APIs',
   },
   {
     num: '04',
-    title: 'Play the long game loudly',
+    title: 'Performance & Technical Polish',
     description:
-      'Constant refinement and technical curiosity compound faster than talent alone. I build with dedication and curiosity every single day.',
+      'Core Web Vitals tuning, technical SEO, semantic accessibility, and production deployments optimized for sub-second loads and top Lighthouse scores.',
+    stack: 'Web Vitals · Technical SEO · A11y · Vercel',
   },
 ]
 
@@ -55,7 +59,7 @@ export default function Story() {
   return (
     <section
       ref={sectionRef}
-      id="story"
+      id="capabilities"
       className="py-[var(--section)] px-[var(--gutter)] grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-[var(--gutter)] max-w-[1920px] mx-auto"
     >
       {/* Left Column (lg:col-span-6) */}
@@ -64,48 +68,50 @@ export default function Story() {
           isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'
         }`}
       >
-        <Eyebrow>The Story</Eyebrow>
+        <Eyebrow>What I Do</Eyebrow>
 
         <h2 className="font-display uppercase text-h2 sm:text-h1 leading-[0.95] tracking-tight max-w-[16ch] mt-6 text-[var(--foreground)]">
-          Crafting modern digital experiences with conviction.
+          Full-stack craft from concept to launch.
         </h2>
 
         <p className="text-lead text-[var(--muted)] max-w-[46ch] mt-8">
-          From my first line of frontend code to architecting complex full-stack
-          web applications, the through-line has always been obsessive attention to
-          detail. I bridge engineering logic and visual aesthetics to build
-          high-performance digital products that feel effortless and alive.
+          I partner with brands, startups, and teams to take digital products
+          from system architecture to live production—combining tactile frontend
+          interfaces, scalable backends, and conversion-focused execution.
         </p>
       </div>
 
       {/* Right Column (lg:col-span-6 lg:pt-2) */}
       <div className="lg:col-span-6 lg:pt-2">
         <ol className="list-none p-0 m-0">
-          {PRINCIPLES.map((principle, idx) => (
+          {CAPABILITIES.map((item, idx) => (
             <li
-              key={principle.num}
+              key={item.num}
               style={{
                 transitionDelay: isVisible ? `${idx * 120 + 200}ms` : '0ms',
               }}
-              className={`grid grid-cols-[auto_1fr] gap-6 py-8 border-t border-[var(--line)] ${
-                idx === PRINCIPLES.length - 1 ? 'border-b' : ''
+              className={`group grid grid-cols-[auto_1fr] gap-6 py-8 border-t border-[var(--line)] ${
+                idx === CAPABILITIES.length - 1 ? 'border-b' : ''
               } transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] ${
                 isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
               }`}
             >
               {/* Left: Number */}
               <span className="font-sans text-h3 font-semibold tabular-nums text-[var(--accent)] select-none">
-                {principle.num}
+                {item.num}
               </span>
 
-              {/* Right: Title & Description */}
+              {/* Right: Title, Description & Stack */}
               <div>
-                <h3 className="font-sans text-h3 font-semibold tracking-tight text-[var(--foreground)]">
-                  {principle.title}
+                <h3 className="font-sans text-h3 font-semibold tracking-tight text-[var(--foreground)] group-hover:text-[var(--accent)] transition-colors duration-300">
+                  {item.title}
                 </h3>
-                <p className="text-body text-[var(--muted)] mt-3 max-w-[44ch]">
-                  {principle.description}
+                <p className="text-body text-[var(--muted)] mt-3 max-w-[46ch]">
+                  {item.description}
                 </p>
+                <div className="text-xs uppercase tracking-[0.18em] text-[var(--muted)] mt-4 select-none">
+                  {item.stack}
+                </div>
               </div>
             </li>
           ))}

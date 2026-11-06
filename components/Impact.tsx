@@ -3,11 +3,31 @@
 import React, { useEffect, useRef, useState } from 'react'
 import Eyebrow from './Eyebrow'
 
-const METRICS = [
-  { figure: '4+', label: 'Years building modern web applications' },
-  { figure: '15+', label: 'Production projects & platforms delivered' },
-  { figure: '99%', label: 'Lighthouse performance & accessibility' },
-  { figure: '100%', label: 'Commitment to craft & code quality' },
+const PROCESS_STEPS = [
+  {
+    step: '01',
+    title: 'Discovery & Scope',
+    description:
+      'Aligning on business goals, user flows, technical architecture, and clear milestones before writing the first line of code.',
+  },
+  {
+    step: '02',
+    title: 'Interface & Motion',
+    description:
+      'Translating brand direction into responsive layouts, reusable UI components, and purposeful micro-interactions.',
+  },
+  {
+    step: '03',
+    title: 'Systems & Integration',
+    description:
+      'Engineering type-safe frontend views, clean API layers, and structured databases built for real-world scale.',
+  },
+  {
+    step: '04',
+    title: 'QA & Launch',
+    description:
+      'Cross-device testing, speed and SEO optimization, and seamless production deployment with zero guesswork.',
+  },
 ]
 
 export default function Impact() {
@@ -35,49 +55,61 @@ export default function Impact() {
   return (
     <section
       ref={sectionRef}
-      id="impact"
+      id="process"
       className="py-[var(--section)] px-[var(--gutter)] max-w-[1920px] mx-auto"
     >
       {/* Header */}
-      <div>
-        <Eyebrow>By The Numbers</Eyebrow>
-        <h2 className="font-display uppercase text-h2 sm:text-h1 leading-[0.95] tracking-tight mt-6 text-[var(--foreground)]">
-          Engineering in metrics.
-        </h2>
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-4">
+        <div>
+          <Eyebrow>How I Work</Eyebrow>
+          <h2 className="font-display uppercase text-h2 sm:text-h1 leading-[0.95] tracking-tight mt-6 text-[var(--foreground)]">
+            A disciplined path to production.
+          </h2>
+        </div>
+        <div className="text-xs uppercase tracking-[0.22em] text-[var(--muted)] font-medium select-none">
+          04 / Workflow Phases
+        </div>
       </div>
 
-      {/* Metrics dl */}
-      <dl className="mt-16 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 border-t border-[var(--line)]">
-        {METRICS.map((metric, idx) => {
-          let borderClasses = ''
-          if (idx === 1 || idx === 3) {
-            borderClasses = 'sm:border-l sm:pl-8 lg:border-l lg:pl-8'
+      {/* Process Grid */}
+      <ol className="list-none p-0 m-0 mt-16 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 border-t border-[var(--line)]">
+        {PROCESS_STEPS.map((item, idx) => {
+          let spacingClasses = ''
+          if (idx === 0) {
+            spacingClasses = 'sm:pr-8'
+          } else if (idx === 1) {
+            spacingClasses = 'sm:border-l sm:pl-8 lg:pr-8'
           } else if (idx === 2) {
-            borderClasses = 'lg:border-l lg:pl-8'
+            spacingClasses = 'sm:pr-8 lg:border-l lg:pl-8'
+          } else if (idx === 3) {
+            spacingClasses = 'sm:border-l sm:pl-8'
           }
 
           return (
-            <div
-              key={metric.label}
+            <li
+              key={item.step}
               style={{
                 transitionDelay: isVisible ? `${idx * 120}ms` : '0ms',
               }}
-              className={`py-12 border-b border-[var(--line)] ${borderClasses} transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+              className={`group py-12 border-b border-[var(--line)] ${spacingClasses} transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] ${
                 isVisible
                   ? 'opacity-100 translate-y-0'
                   : 'opacity-0 translate-y-8'
               }`}
             >
-              <dd className="font-display text-display leading-none tracking-tight text-[var(--foreground)] transition-colors duration-300 hover:text-[var(--accent)] cursor-default">
-                {metric.figure}
-              </dd>
-              <dt className="text-body uppercase tracking-[0.14em] text-[var(--muted)] max-w-[20ch] mt-4">
-                {metric.label}
-              </dt>
-            </div>
+              <span className="block font-display text-display leading-none tracking-tight text-[var(--foreground)] transition-colors duration-300 group-hover:text-[var(--accent)] select-none">
+                {item.step}
+              </span>
+              <h3 className="font-sans text-h3 font-semibold tracking-tight text-[var(--foreground)] mt-6">
+                {item.title}
+              </h3>
+              <p className="text-body text-[var(--muted)] mt-3">
+                {item.description}
+              </p>
+            </li>
           )
         })}
-      </dl>
+      </ol>
     </section>
   )
 }
