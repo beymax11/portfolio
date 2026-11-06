@@ -14,22 +14,22 @@ export default function ContactFooter() {
   return (
     <footer
       id="contact"
-      className="pt-[var(--section)] px-[var(--gutter)] max-w-[1920px] mx-auto overflow-hidden bg-[#08080a]"
+      className="pt-12 sm:pt-24 lg:pt-[var(--section)] px-[var(--gutter)] max-w-[1920px] mx-auto overflow-hidden bg-[#08080a]"
     >
       {/* Top CTA Area */}
       <div>
         <Eyebrow>Let&apos;s Build</Eyebrow>
 
-        <h2 className="font-display uppercase text-h1 sm:text-display leading-[0.95] tracking-tight max-w-[18ch] mt-6 text-[var(--foreground)]">
+        <h2 className="font-display uppercase text-h1 sm:text-display leading-[0.95] tracking-tight max-w-[18ch] mt-4 sm:mt-6 text-[var(--foreground)]">
           Let&apos;s make something legendary.
         </h2>
 
-        <p className="text-lead text-[var(--muted)] max-w-[44ch] mt-8">
+        <p className="text-lead text-[var(--muted)] max-w-[44ch] mt-5 sm:mt-8">
           Ready to elevate your next product? Let&apos;s craft an experience worth remembering. I read and respond to every message.
         </p>
 
         {/* Interactive Email Link & Resume */}
-        <div className="mt-12 flex flex-col sm:flex-row items-start sm:items-center gap-6">
+        <div className="mt-8 sm:mt-12 flex flex-col sm:flex-row items-start sm:items-center gap-5 sm:gap-6">
           <a
             href="mailto:dimaandalrimvernon@gmail.com"
             className="group inline-flex items-baseline gap-4 font-sans text-h3 sm:text-h1 font-semibold tracking-tight transition-all duration-300 hover:translate-x-3.5 hover:text-[var(--accent)] text-[var(--foreground)] select-none"
@@ -55,7 +55,7 @@ export default function ContactFooter() {
       </div>
 
       {/* Bottom Bar */}
-      <div className="mt-[var(--section)] border-t border-[var(--line)] py-12 grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+      <div className="mt-12 sm:mt-24 lg:mt-[var(--section)] border-t border-[var(--line)] py-8 sm:py-12 grid grid-cols-1 lg:grid-cols-12 gap-8 sm:gap-10 items-start">
         {/* Left: Signature & Subtitle */}
         <div className="lg:col-span-6">
           <div className="font-display text-h2 uppercase leading-none text-[var(--foreground)] tracking-tight">

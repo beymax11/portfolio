@@ -29,11 +29,11 @@ export default function Hero({ isReady = false }: HeroProps) {
       className="relative flex flex-col justify-between min-h-svh w-full overflow-hidden bg-[#08080a]"
     >
       {/* Top Row (z-30) */}
-      <div className="z-30 pt-28 sm:pt-32 px-[var(--gutter)] flex flex-col sm:flex-row items-start justify-between gap-8 w-full">
+      <div className="z-30 pt-24 sm:pt-32 px-[var(--gutter)] flex flex-col sm:flex-row items-start justify-between gap-5 sm:gap-8 w-full">
         {/* Left: Role Words */}
         <h2>
           {ROLES.map((role, idx) => (
-            <span key={role} className="block overflow-hidden">
+            <span key={`${role}-${idx}`} className="block overflow-hidden">
               <span
                 style={{
                   transform: animated ? 'translateY(0)' : 'translateY(115%)',
@@ -65,7 +65,7 @@ export default function Hero({ isReady = false }: HeroProps) {
       {/* Giant Surname (z-10 behind portrait) */}
       <div
         aria-hidden="true"
-        className="absolute inset-x-0 bottom-0 translate-y-[4%] z-10 flex flex-col items-center font-display uppercase leading-[0.8] tracking-tight text-[var(--accent)] text-[7rem] sm:text-[14rem] md:text-[18rem] lg:text-[22rem] select-none pointer-events-none"
+        className="absolute inset-x-0 bottom-[18vh] sm:bottom-0 translate-y-0 sm:translate-y-[4%] z-10 flex flex-col items-center font-display uppercase leading-[0.8] tracking-tight text-[var(--accent)] text-[7rem] sm:text-[14rem] md:text-[18rem] lg:text-[22rem] select-none pointer-events-none"
       >
         {/* Line 1: RIM */}
         <div className="flex -translate-y-3 sm:-translate-y-5 md:-translate-y-7 lg:-translate-y-9">
@@ -103,7 +103,7 @@ export default function Hero({ isReady = false }: HeroProps) {
       </div>
 
       {/* Transparent Portrait Cutout Layer (z-20 pointer-events-none) */}
-      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 h-[82vh] sm:h-[88vh] w-[90vw] sm:w-[58vw] lg:w-[44vw] max-w-[760px] z-20 pointer-events-none flex items-end justify-center">
+      <div className="absolute bottom-[9vh] sm:bottom-0 left-1/2 -translate-x-1/2 h-[64vh] sm:h-[88vh] w-[94vw] sm:w-[58vw] lg:w-[44vw] max-w-[760px] z-20 pointer-events-none flex items-end justify-center">
         <div
           style={{
             opacity: animated ? 1 : 0,
@@ -125,11 +125,11 @@ export default function Hero({ isReady = false }: HeroProps) {
       {/* Gradient Base (z-20) */}
       <div
         aria-hidden="true"
-        className="absolute inset-x-0 bottom-0 h-[26vh] z-20 bg-gradient-to-b from-transparent to-[#08080a] pointer-events-none"
+        className="absolute inset-x-0 bottom-0 h-[31vh] sm:h-[26vh] z-20 bg-[linear-gradient(to_bottom,transparent_0%,#08080a_66%,#08080a_100%)] sm:bg-gradient-to-b sm:from-transparent sm:to-[#08080a] pointer-events-none"
       />
 
       {/* Scroll Cue (z-30) */}
-      <div className="relative z-30 mb-8 ml-[var(--gutter)] flex items-center gap-3 text-xs uppercase tracking-[0.22em] text-[var(--muted)] select-none">
+      <div className="relative z-30 mb-6 sm:mb-8 ml-[var(--gutter)] flex items-center gap-3 text-xs uppercase tracking-[0.22em] text-[var(--muted)] select-none">
         <span
           aria-hidden="true"
           className="w-[1px] h-10 bg-[var(--accent)] animate-pulse"

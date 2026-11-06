@@ -22,15 +22,21 @@ export default function SiteNav() {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
-  // Lock body scroll when mobile menu is open
+  // Lock body scroll and listen for Escape when mobile menu is open
   useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setMobileMenuOpen(false)
+    }
+
     if (mobileMenuOpen) {
       document.body.style.overflow = 'hidden'
+      window.addEventListener('keydown', handleKeyDown)
     } else {
       document.body.style.overflow = ''
     }
     return () => {
       document.body.style.overflow = ''
+      window.removeEventListener('keydown', handleKeyDown)
     }
   }, [mobileMenuOpen])
 
@@ -39,8 +45,8 @@ export default function SiteNav() {
       <nav
         aria-label="Primary navigation"
         className={`pointer-events-auto flex items-center justify-between py-6 px-[var(--gutter)] transition-all duration-300 ${isScrolled
-            ? 'bg-[#08080a]/80 backdrop-blur-md border-b border-[var(--line)]'
-            : 'bg-transparent'
+          ? 'bg-[#08080a]/80 backdrop-blur-md border-b border-[var(--line)]'
+          : 'bg-transparent'
           }`}
       >
         {/* Logo (Left) */}
@@ -92,12 +98,59 @@ export default function SiteNav() {
 
       {/* Mobile Menu Panel (<md) */}
       <div
-        className={`md:hidden fixed inset-0 z-40 bg-[var(--background)] flex flex-col justify-center px-[var(--gutter)] transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${mobileMenuOpen
-            ? 'opacity-100 pointer-events-auto translate-y-0'
-            : 'opacity-0 pointer-events-none -translate-y-4'
+        role="dialog"
+        aria-modal="true"
+        aria-label="Mobile navigation menu"
+        aria-hidden={!mobileMenuOpen}
+        className={`md:hidden fixed inset-0 z-50 bg-[var(--background)] flex flex-col justify-between py-6 px-[var(--gutter)] transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${mobileMenuOpen
+          ? 'opacity-100 pointer-events-auto translate-y-0'
+          : 'opacity-0 pointer-events-none -translate-y-4'
           }`}
       >
-        <ul className="flex flex-col gap-6">
+        {/* Drawer Top Bar with Brand & Close Button */}
+        <div className="flex items-center justify-between">
+          <a
+            href="#top"
+            onClick={() => setMobileMenuOpen(false)}
+            className="flex items-center gap-3.5 group"
+            aria-label="Rim Dimaandal Home"
+          >
+            <div className="size-10 rounded-full border border-[var(--line-strong)] grid place-items-center font-semibold text-sm text-[var(--foreground)] group-hover:border-[var(--accent)] transition-colors">
+              RD
+            </div>
+            <span className="hidden sm:inline-block text-xs uppercase tracking-[0.22em] text-[var(--muted)] group-hover:text-[var(--foreground)] transition-colors">
+              Rim Vernon Dimaandal
+            </span>
+          </a>
+
+          <button
+            type="button"
+            onClick={() => setMobileMenuOpen(false)}
+            aria-label="Close navigation menu"
+            className="group h-10 px-4 rounded-full border border-[var(--line-strong)] hover:border-[var(--accent)] inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.2em] font-medium text-[var(--foreground)] hover:text-[var(--accent)] transition-colors focus:outline-none"
+          >
+            <span>Close</span>
+            <svg
+              viewBox="0 0 24 24"
+              width="14"
+              height="14"
+              aria-hidden="true"
+              className="text-[var(--accent)] transition-transform duration-300 group-hover:rotate-90"
+            >
+              <path
+                d="M18 6L6 18M6 6l12 12"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </button>
+        </div>
+
+        {/* Drawer Nav Links */}
+        <ul className="flex flex-col gap-6 my-auto py-8">
           {NAV_LINKS.map((link, idx) => (
             <li
               key={link.href}
@@ -105,8 +158,8 @@ export default function SiteNav() {
                 transitionDelay: mobileMenuOpen ? `${idx * 60 + 80}ms` : '0ms',
               }}
               className={`transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${mobileMenuOpen
-                  ? 'translate-y-0 opacity-100'
-                  : 'translate-y-12 opacity-0'
+                ? 'translate-y-0 opacity-100'
+                : 'translate-y-12 opacity-0'
                 }`}
             >
               <a
@@ -120,9 +173,10 @@ export default function SiteNav() {
           ))}
         </ul>
 
-        <div className="mt-16 pt-8 border-t border-[var(--line)]">
+        {/* Drawer Footer */}
+        <div className="pt-6 border-t border-[var(--line)]">
           <p className="text-xs uppercase tracking-[0.22em] text-[var(--muted)]">
-            Creative Developer · Frontend Engineer
+            Application Developer · Software Developer
           </p>
         </div>
       </div>

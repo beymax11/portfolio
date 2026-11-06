@@ -1,0 +1,215 @@
+.depth-carousel {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 240px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  perspective: var(--dc-perspective, 1400px);
+  perspective-origin: calc(50% + var(--dc-shift-x, 0px)) 50%;
+  touch-action: pan-y;
+  outline: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  cursor: grab;
+}
+
+.depth-carousel:active {
+  cursor: grabbing;
+}
+
+.depth-carousel:focus-visible {
+  outline: 2px solid var(--accent, rgba(255, 255, 255, 0.5));
+  outline-offset: 4px;
+  border-radius: 12px;
+}
+
+.depth-carousel__stage {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  pointer-events: none;
+}
+
+.depth-carousel__card {
+  position: absolute;
+  top: 50%;
+  left: calc(50% + var(--dc-shift-x, 0px));
+  transform-origin: center center;
+  overflow: hidden;
+  background: var(--surface, #0b0d12);
+  border: 1px solid rgba(243, 241, 234, 0.16);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    0 28px 60px -18px rgba(0, 0, 0, 0.82),
+    0 10px 24px -10px rgba(0, 0, 0, 0.65);
+  will-change: transform, opacity;
+  cursor: pointer;
+  transform: translate(-50%, -50%);
+}
+
+.depth-carousel__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  pointer-events: none;
+  -webkit-user-drag: none;
+  will-change: filter, transform;
+}
+
+.depth-carousel__tint {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+  mix-blend-mode: multiply;
+}
+
+.depth-carousel__arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 3000;
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--line-strong, rgba(255, 255, 255, 0.18));
+  border-radius: 999px;
+  background: rgba(17, 17, 20, 0.72);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: var(--foreground, #fff);
+  cursor: pointer;
+  transition:
+    background 0.25s ease,
+    border-color 0.25s ease,
+    color 0.25s ease,
+    transform 0.2s ease;
+}
+
+.depth-carousel__arrow:hover {
+  background: rgba(23, 23, 27, 0.92);
+  border-color: var(--accent, rgba(255, 255, 255, 0.4));
+  color: var(--accent, #fff);
+}
+
+.depth-carousel__arrow:active {
+  transform: translateY(-50%) scale(0.94);
+}
+
+.depth-carousel__arrow--prev {
+  left: clamp(16px, 2.5vw, 40px);
+}
+
+.depth-carousel__arrow--next {
+  right: clamp(16px, 2.5vw, 40px);
+}
+
+.depth-carousel__dots {
+  position: absolute;
+  bottom: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 3000;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 14px;
+  border: 1px solid var(--line, rgba(255, 255, 255, 0.08));
+  border-radius: 999px;
+  background: rgba(14, 15, 19, 0.65);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.depth-carousel__dot {
+  width: 7px;
+  height: 7px;
+  padding: 0;
+  border: none;
+  border-radius: 999px;
+  background: rgba(243, 241, 234, 0.28);
+  cursor: pointer;
+  transition:
+    width 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+    background 0.25s ease;
+}
+
+.depth-carousel__dot:hover {
+  background: rgba(243, 241, 234, 0.55);
+}
+
+.depth-carousel__dot.is-active {
+  width: 22px;
+  background: var(--accent, #fff);
+}
+
+.depth-carousel-dossier {
+  animation: depth-dossier-in 0.42s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes depth-dossier-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 639px) {
+  .depth-carousel {
+    min-height: 220px;
+  }
+
+  .depth-carousel__card {
+    top: calc(50% - 22px);
+    border-color: rgba(243, 241, 234, 0.2);
+  }
+
+  .depth-carousel__arrow {
+    top: auto;
+    bottom: 4px;
+    width: 34px;
+    height: 34px;
+    transform: none;
+  }
+
+  .depth-carousel__arrow:active {
+    transform: scale(0.94);
+  }
+
+  .depth-carousel__arrow--prev {
+    left: calc(50% - 102px);
+  }
+
+  .depth-carousel__arrow--next {
+    right: calc(50% - 102px);
+  }
+
+  .depth-carousel__dots {
+    bottom: 9px;
+    padding: 8px 12px;
+    gap: 7px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .depth-carousel__card,
+  .depth-carousel__img {
+    will-change: auto;
+  }
+  .depth-carousel__arrow,
+  .depth-carousel__dot {
+    transition: none;
+  }
+  .depth-carousel-dossier {
+    animation: none;
+  }
+}

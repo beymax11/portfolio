@@ -60,7 +60,7 @@ export default function Story() {
     <section
       ref={sectionRef}
       id="capabilities"
-      className="py-[var(--section)] px-[var(--gutter)] grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-[var(--gutter)] max-w-[1920px] mx-auto"
+      className="py-14 sm:py-24 lg:py-[var(--section)] px-[var(--gutter)] grid grid-cols-1 lg:grid-cols-12 gap-8 sm:gap-12 lg:gap-[var(--gutter)] max-w-[1920px] mx-auto"
     >
       {/* Left Column (lg:col-span-6) */}
       <div
@@ -70,11 +70,11 @@ export default function Story() {
       >
         <Eyebrow>What I Do</Eyebrow>
 
-        <h2 className="font-display uppercase text-h2 sm:text-h1 leading-[0.95] tracking-tight max-w-[16ch] mt-6 text-[var(--foreground)]">
+        <h2 className="font-display uppercase text-h2 sm:text-h1 leading-[0.95] tracking-tight max-w-[16ch] mt-4 sm:mt-6 text-[var(--foreground)]">
           Full-stack craft from concept to launch.
         </h2>
 
-        <p className="text-lead text-[var(--muted)] max-w-[46ch] mt-8">
+        <p className="text-lead text-[var(--muted)] max-w-[46ch] mt-5 sm:mt-8">
           I partner with brands, startups, and teams to take digital products
           from system architecture to live production—combining tactile frontend
           interfaces, scalable backends, and conversion-focused execution.
@@ -90,7 +90,7 @@ export default function Story() {
               style={{
                 transitionDelay: isVisible ? `${idx * 120 + 200}ms` : '0ms',
               }}
-              className={`group grid grid-cols-[auto_1fr] gap-6 py-8 border-t border-[var(--line)] ${
+              className={`group grid grid-cols-[auto_1fr] gap-4 sm:gap-6 py-6 sm:py-8 border-t border-[var(--line)] ${
                 idx === CAPABILITIES.length - 1 ? 'border-b' : ''
               } transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] ${
                 isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'

@@ -82,6 +82,19 @@ export const projects: Project[] = [
     link: 'https://agshop.lat',
     span: 'default',
   },
+  {
+    id: 5,
+    title: 'Lash & Slay',
+    category: 'Couture Beauty & Booking Platform',
+    description:
+      'Couture lash salon and luxury membership platform featuring bespoke service menus, online appointment reservations, and interactive digital loyalty rewards.',
+    image: '/lashnslay.png',
+    alt: 'Lash & Slay Couture Lash Salon',
+    tags: ['Next.js', 'React', 'Tailwind', 'Booking'],
+    color: 'from-neutral-700/30 to-stone-500/20',
+    link: 'https://lashnslay.vercel.app/',
+    span: 'default',
+  },
 ]
 
 export const techStack = [
