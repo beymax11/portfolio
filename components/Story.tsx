@@ -1,7 +1,10 @@
 'use client'
 
-import React, { useEffect, useRef, useState } from 'react'
+import React from 'react'
+import { motion, type Variants } from 'framer-motion'
 import Eyebrow from './Eyebrow'
+
+const EASE: [number, number, number, number] = [0.16, 1, 0.3, 1]
 
 const CAPABILITIES = [
   {
@@ -34,66 +37,95 @@ const CAPABILITIES = [
   },
 ]
 
+const leftContainerVariants: Variants = {
+  hidden: {},
+  visible: {
+    transition: {
+      staggerChildren: 0.12,
+    },
+  },
+}
+
+const leftItemVariants: Variants = {
+  hidden: { opacity: 0, y: 32 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.85, ease: EASE },
+  },
+}
+
+const listContainerVariants: Variants = {
+  hidden: {},
+  visible: {
+    transition: {
+      staggerChildren: 0.12,
+      delayChildren: 0.15,
+    },
+  },
+}
+
+const listItemVariants: Variants = {
+  hidden: { opacity: 0, y: 32 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.75, ease: EASE },
+  },
+}
+
 export default function Story() {
-  const sectionRef = useRef<HTMLElement>(null)
-  const [isVisible, setIsVisible] = useState(false)
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true)
-          observer.disconnect()
-        }
-      },
-      { threshold: 0.15 }
-    )
-
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current)
-    }
-
-    return () => observer.disconnect()
-  }, [])
-
   return (
     <section
-      ref={sectionRef}
       id="capabilities"
       className="py-14 sm:py-24 lg:py-[var(--section)] px-[var(--gutter)] grid grid-cols-1 lg:grid-cols-12 gap-8 sm:gap-12 lg:gap-[var(--gutter)] max-w-[1920px] mx-auto"
     >
       {/* Left Column (lg:col-span-6) */}
-      <div
-        className={`lg:col-span-6 transition-all duration-1000 ease-[cubic-bezier(0.16,1,0.3,1)] ${
-          isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'
-        }`}
+      <motion.div
+        variants={leftContainerVariants}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.2 }}
+        className="lg:col-span-6"
       >
-        <Eyebrow>What I Do</Eyebrow>
+        <motion.div variants={leftItemVariants}>
+          <Eyebrow>What I Do</Eyebrow>
+        </motion.div>
 
-        <h2 className="font-display uppercase text-h2 sm:text-h1 leading-[0.95] tracking-tight max-w-[16ch] mt-4 sm:mt-6 text-[var(--foreground)]">
+        <motion.h2
+          variants={leftItemVariants}
+          className="font-display uppercase text-h2 sm:text-h1 leading-[0.95] tracking-tight max-w-[16ch] mt-4 sm:mt-6 text-[var(--foreground)]"
+        >
           Full-stack craft from concept to launch.
-        </h2>
+        </motion.h2>
 
-        <p className="text-lead text-[var(--muted)] max-w-[46ch] mt-5 sm:mt-8">
+        <motion.p
+          variants={leftItemVariants}
+          className="text-lead text-[var(--muted)] max-w-[46ch] mt-5 sm:mt-8"
+        >
           I partner with brands, startups, and teams to take digital products
           from system architecture to live production—combining tactile frontend
           interfaces, scalable backends, and conversion-focused execution.
-        </p>
-      </div>
+        </motion.p>
+      </motion.div>
 
       {/* Right Column (lg:col-span-6 lg:pt-2) */}
       <div className="lg:col-span-6 lg:pt-2">
-        <ol className="list-none p-0 m-0">
+        <motion.ol
+          variants={listContainerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.15 }}
+          className="list-none p-0 m-0"
+        >
           {CAPABILITIES.map((item, idx) => (
-            <li
+            <motion.li
               key={item.num}
-              style={{
-                transitionDelay: isVisible ? `${idx * 120 + 200}ms` : '0ms',
-              }}
+              variants={listItemVariants}
+              whileHover={{ x: 6 }}
+              transition={{ duration: 0.3, ease: EASE }}
               className={`group grid grid-cols-[auto_1fr] gap-4 sm:gap-6 py-6 sm:py-8 border-t border-[var(--line)] ${
                 idx === CAPABILITIES.length - 1 ? 'border-b' : ''
-              } transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] ${
-                isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
               }`}
             >
               {/* Left: Number */}
@@ -113,9 +145,9 @@ export default function Story() {
                   {item.stack}
                 </div>
               </div>
-            </li>
+            </motion.li>
           ))}
-        </ol>
+        </motion.ol>
       </div>
     </section>
   )

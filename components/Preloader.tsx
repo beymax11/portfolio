@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { useLenis } from './SmoothScroll'
 
 interface PreloaderProps {
@@ -13,18 +13,31 @@ export default function Preloader({ onComplete }: PreloaderProps) {
   const [wipingUp, setWipingUp] = useState(false)
   const [isVisible, setIsVisible] = useState(true)
 
-  const { stop, start } = useLenis()
+  const { stop, start, scrollTo } = useLenis()
+  const onCompleteRef = useRef(onComplete)
+  const hasCompletedRef = useRef(false)
 
   useEffect(() => {
-    // 1. Stop scroll and lock at top
-    stop()
-    window.scrollTo(0, 0)
+    onCompleteRef.current = onComplete
+  }, [onComplete])
 
-    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  useEffect(() => {
+    if (hasCompletedRef.current) return
+
+    // 1. Stop scroll and lock at top
+    window.scrollTo(0, 0)
+    scrollTo(0, { immediate: true, force: true })
+    stop()
+
+    const prefersReduced = window.matchMedia(
+      '(prefers-reduced-motion: reduce)'
+    ).matches
     const duration = prefersReduced ? 400 : 2000
     const startTimestamp = performance.now()
 
     let animationFrameId: number
+    let wipeTimeout: ReturnType<typeof setTimeout> | null = null
+    let completeTimeout: ReturnType<typeof setTimeout> | null = null
 
     const step = (now: number) => {
       const elapsed = now - startTimestamp
@@ -38,26 +51,23 @@ export default function Preloader({ onComplete }: PreloaderProps) {
       if (progress < 1) {
         animationFrameId = requestAnimationFrame(step)
       } else {
+        hasCompletedRef.current = true
         setCount(100)
 
         // 3. Fade labels out over ~300ms
         setLabelsFading(true)
 
         // 4. Wait 200ms delay, then wipe container upwards over 650ms
-        const wipeTimeout = setTimeout(() => {
+        wipeTimeout = setTimeout(() => {
           setWipingUp(true)
+          // Unfreeze Lenis as the curtain begins lifting so scrolling is immediately responsive
+          start()
+          onCompleteRef.current?.()
 
-          const completeTimeout = setTimeout(() => {
-            // 5. Unfreeze Lenis, trigger hero entrance, remove preloader
-            start()
-            onComplete?.()
+          completeTimeout = setTimeout(() => {
             setIsVisible(false)
           }, 650)
-
-          return () => clearTimeout(completeTimeout)
         }, 500) // 300ms fade + 200ms pause
-
-        return () => clearTimeout(wipeTimeout)
       }
     }
 
@@ -65,8 +75,10 @@ export default function Preloader({ onComplete }: PreloaderProps) {
 
     return () => {
       cancelAnimationFrame(animationFrameId)
+      if (wipeTimeout) clearTimeout(wipeTimeout)
+      if (completeTimeout) clearTimeout(completeTimeout)
     }
-  }, [stop, start, onComplete])
+  }, [stop, start, scrollTo])
 
   if (!isVisible) return null
 

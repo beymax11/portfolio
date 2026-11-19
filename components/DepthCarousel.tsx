@@ -71,6 +71,7 @@ interface ConfigState {
 
 interface DragState {
   x: number
+  y: number
   startPos: number
   lastX: number
   lastT: number
@@ -401,7 +402,10 @@ const DepthCarousel = ({
 
       const absX = Math.abs(e.deltaX)
       const absY = Math.abs(e.deltaY)
-      if (cfg.captureWheel === 'horizontal' && (absX <= absY || absX < 4)) {
+      if (
+        cfg.captureWheel === 'horizontal' &&
+        (absX <= absY * 1.5 || absX < 6)
+      ) {
         return
       }
 
@@ -429,11 +433,12 @@ const DepthCarousel = ({
   const onPointerDown = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
     const cfg = cfgRef.current
     if (cfg.count < 2) return
+    if (e.pointerType === 'mouse' && e.button !== 0) return
     if ((e.target as HTMLElement | null)?.closest('button, a')) return
     justDraggedRef.current = false
-    tweenRef.current?.kill()
     dragRef.current = {
       x: e.clientX,
+      y: e.clientY,
       startPos: posRef.current,
       lastX: e.clientX,
       lastT: performance.now(),
@@ -450,13 +455,23 @@ const DepthCarousel = ({
       const cfg = cfgRef.current
       const stepPx = Math.max(cfg.cardWidth * 0.55 * scaleRef.current, 40)
       const dx = e.clientX - drag.x
-      if (!drag.moved && Math.abs(dx) > 4) {
-        drag.moved = true
-        justDraggedRef.current = true
-        try {
-          rootRef.current?.setPointerCapture(drag.id)
-        } catch {
-          // Ignore pointer capture errors on synthetic events
+      const dy = e.clientY - drag.y
+      if (!drag.moved) {
+        const absX = Math.abs(dx)
+        const absY = Math.abs(dy)
+        if (absY > absX && absY > 6) {
+          dragRef.current = null
+          return
+        }
+        if (absX > 6 && absX > absY * 1.2) {
+          drag.moved = true
+          justDraggedRef.current = true
+          tweenRef.current?.kill()
+          try {
+            rootRef.current?.setPointerCapture(drag.id)
+          } catch {
+            // Ignore pointer capture errors on synthetic events
+          }
         }
       }
       if (!drag.moved) return

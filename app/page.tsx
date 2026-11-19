@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import SmoothScrollProvider from '@/components/SmoothScroll'
 import Preloader from '@/components/Preloader'
 import SiteNav from '@/components/SiteNav'
@@ -17,10 +17,14 @@ function HomeContent() {
   const [heroReady, setHeroReady] = useState(false)
   useAdaptiveScaling()
 
+  const handlePreloaderComplete = useCallback(() => {
+    setHeroReady(true)
+  }, [])
+
   return (
     <>
-      <Preloader onComplete={() => setHeroReady(true)} />
-      <SiteNav />
+      <Preloader onComplete={handlePreloaderComplete} />
+      <SiteNav isReady={heroReady} />
       <main className="relative flex flex-col w-full bg-[#08080a]">
         <Hero isReady={heroReady} />
         <Marquee />

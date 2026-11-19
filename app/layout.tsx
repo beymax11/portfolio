@@ -56,7 +56,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${anton.variable} ${onest.variable} scroll-smooth`}
+      className={`${anton.variable} ${onest.variable}`}
     >
       <body className="bg-background text-foreground font-sans antialiased overflow-x-hidden selection:bg-[var(--accent)] selection:text-[var(--background)]">
         {children}

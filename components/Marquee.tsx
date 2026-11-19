@@ -1,6 +1,7 @@
 'use client'
 
 import React from 'react'
+import { motion } from 'framer-motion'
 
 const MARQUEE_ITEMS = [
   'React',
@@ -35,14 +36,18 @@ export default function Marquee() {
   )
 
   return (
-    <div
+    <motion.div
       aria-label="Tech Stack Ticker"
+      initial={{ opacity: 0, y: 24 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.3 }}
+      transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
       className="relative w-full border-y border-[var(--line)] py-8 overflow-hidden select-none bg-[#08080a]"
     >
       <div className="flex w-max animate-marquee will-change-transform">
         {renderItemSet('set-1')}
         {renderItemSet('set-2')}
       </div>
-    </div>
+    </motion.div>
   )
 }
